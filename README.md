@@ -6,7 +6,7 @@ Explore datasets using PySpark
 
 [Install Apache Spark on MacOS](https://notadatascientist.com/install-spark-on-macos/)
 
-`.bashrc` or `.zshrc`
+For Mac, modify `.bashrc` or `.zshrc` files
 ```ini
 PYSPARK_PYTHON=/usr/bin/python3
 ```
