@@ -17,5 +17,5 @@ Each project has a datasets folder inside them, e.g. `movielens/datasets`
 
 To run a script
 ```console
-pyspark movielens/ratings.py
+spark-submit movielens/ratings.py
 ```
