@@ -1,6 +1,8 @@
 # bigdata
 
-## Getting started
+Explore datasets using PySpark
+
+## Setup
 
 [Install Apache Spark on MacOS](https://notadatascientist.com/install-spark-on-macos/)
 
@@ -9,7 +11,11 @@
 PYSPARK_PYTHON=/usr/bin/python3
 ```
 
-Then run
+Each project has a datasets folder inside them, e.g. `movielens/datasets`
+
+## Getting started
+
+To run a script
 ```console
-pyspark
+pyspark movielens/ratings.py
 ```
