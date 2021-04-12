@@ -19,3 +19,10 @@ To run a script
 ```console
 spark-submit movielens/ratings.py
 ```
+
+## Datasets
+
+Avoid committing files that are over 500KB.
+
+Download these large datasets:
+- [movielens/datasets/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)
