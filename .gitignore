@@ -131,6 +131,7 @@ dmypy.json
 # local
 .vscode
 .DS_Store
+.idea
 */datasets/*
 
 # datasets
