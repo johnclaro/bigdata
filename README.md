@@ -11,13 +11,13 @@ For Mac, modify `.bashrc` or `.zshrc` files
 PYSPARK_PYTHON=/usr/bin/python3
 ```
 
-Each project has a datasets folder inside them, e.g. `movielens/datasets`
+Each project has a datasets folder inside them, e.g. `fk/datasets`
 
 ## Getting started
 
 To run a script
 ```console
-spark-submit movielens/ratings.py
+spark-submit fk/ratings.py
 ```
 
 ## Datasets
@@ -25,4 +25,4 @@ spark-submit movielens/ratings.py
 Avoid committing files that are over 500KB.
 
 Download these large datasets:
-- [movielens/datasets/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)
+- [fk/datasets/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)

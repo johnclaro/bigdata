@@ -13,7 +13,7 @@ def parse_lines(line: str) -> tuple:
 
 def init_friends(friends: int) -> tuple:
     """Initialises the number of friends for an age.
-    
+
     Args:
         friends: Number of friends of an age.
 
@@ -27,11 +27,11 @@ def init_friends(friends: int) -> tuple:
 
 def increment_friends(x: tuple, y: tuple) -> tuple:
     """Gathers all values for each age and adds each of them together.
-    
+
     Args:
         x: Value of an age.
         y: Value of an age.
-    
+
     Returns:
         A tuple that becomes the value for the key 'age'.
             0 - Total number of friends of an age.
@@ -50,7 +50,7 @@ def calculate_average(x: tuple) -> float:
     return average
 
 
-lines = context.textFile('movielens/datasets/friends.csv')
+lines = context.textFile('fk/datasets/friends.csv')
 rdd = lines.map(parse_lines)
 totals = rdd.mapValues(init_friends).reduceByKey(increment_friends)
 averages = totals.mapValues(calculate_average)

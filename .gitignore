@@ -134,5 +134,5 @@ dmypy.json
 */datasets/*
 
 # datasets
-!movielens/datasets/friends.csv
-!movielens/datasets/weather.csv
+!fk/datasets/friends.csv
+!fk/datasets/weather.csv

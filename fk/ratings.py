@@ -6,7 +6,7 @@ from pyspark import SparkConf, SparkContext
 conf = SparkConf().setMaster('local').setAppName('RatingsHistogram')
 sc = SparkContext(conf=conf)
 
-lines = sc.textFile('movielens/datasets/ratings/u.data')
+lines = sc.textFile('fk/datasets/ratings/u.data')
 ratings = lines.map(lambda x: x.split()[2])
 result = ratings.countByValue()
 
