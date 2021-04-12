@@ -50,7 +50,7 @@ def calculate_average(x: tuple) -> float:
     return average
 
 
-lines = context.textFile('movielens/datasets/fakefriends.csv')
+lines = context.textFile('movielens/datasets/friends.csv')
 rdd = lines.map(parse_lines)
 totals = rdd.mapValues(init_friends).reduceByKey(increment_friends)
 averages = totals.mapValues(calculate_average)
