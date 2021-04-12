@@ -130,4 +130,9 @@ dmypy.json
 
 # local
 .vscode
+.DS_Store
 */datasets/*
+
+# datasets
+!movielens/datasets/friends.csv
+!movielens/datasets/weather.csv
