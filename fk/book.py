@@ -14,7 +14,7 @@ def normalize_words(text: str) -> list:
         text: The whole book in txt format
 
     Returns:
-        A list of lowercased words
+        A list of lower cased words
     """
     return re.compile(r'\W+', re.UNICODE).split(text.lower())
 
@@ -44,9 +44,16 @@ def count_words(total: int, increment: int) -> int:
     return total + increment
 
 
-def switch_position(record: tuple) -> tuple:
-    """Switches positions of word and count to sort by key which is count."""
-    return record[1], record[0]
+def switch_position(rdd: Tuple[str, int]) -> Tuple[int, str]:
+    """Switches positions of word and count of an RDD.
+
+    Args:
+        rdd: RDD of word and count
+
+    Returns:
+        rdd: RDD of count and word
+    """
+    return rdd[1], rdd[0]
 
 
 def main():
