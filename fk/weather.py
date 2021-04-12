@@ -53,7 +53,8 @@ def remove_entries(line: str) -> tuple:
 
 
 def find_lowest_temp(lowest_temp: float, next_temp: float) -> float:
-    """Add up all the temperatures for each station then find the minimum.
+    """Compare all temperature for each station then determine if the next
+    temperature is lower than the current lowest temperature.
 
     Args:
         lowest_temp: Current lowest temperature
