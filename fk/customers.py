@@ -44,6 +44,18 @@ def add_spent(total: float, current: float) -> float:
     return total + current
 
 
+def reverse_position(rdd: Tuple[int, float]) -> Tuple[float, int]:
+    """Reverses the position of an element.
+
+    Args:
+        rdd: RDD of customers
+
+    Returns:
+        A tuple with amount spent and customer ID
+    """
+    return rdd[1], rdd[0]
+
+
 def main():
     conf = SparkConf().setMaster('local').setAppName('Customers')
     sc = SparkContext(conf=conf)
@@ -51,8 +63,10 @@ def main():
     customers_rdd = customers_rdd.map(parse_data)
     customers_rdd = customers_rdd.map(map_spent)
     customers_rdd = customers_rdd.reduceByKey(add_spent)
+    customers_rdd = customers_rdd.map(reverse_position)
+    customers_rdd = customers_rdd.sortByKey()
     for customer in customers_rdd.collect():
-        print(f'{customer[0]} \t {customer[1]:.2f}')
+        print(f'{customer[1]} \t {customer[0]:.2f}')
 
 
 if __name__ == '__main__':
