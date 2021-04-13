@@ -138,3 +138,4 @@ dmypy.json
 !fk/datasets/friends.csv
 !fk/datasets/weather.csv
 !fk/datasets/book.txt
+!fk/datasets/customers.csv
