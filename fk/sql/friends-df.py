@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, round
 
