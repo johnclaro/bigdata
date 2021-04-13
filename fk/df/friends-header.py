@@ -7,7 +7,7 @@ def main():
         read.\
         option('header', 'true').\
         option('inferSchema', 'true').\
-        csv('fk/datasets/friends-header.csv')
+        csv('fk/files/friends-header.csv')
 
     print('Here is our schema')
     people.printSchema()

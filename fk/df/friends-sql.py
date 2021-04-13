@@ -15,7 +15,7 @@ def parse_csv(data: str) -> Tuple[int, str, int, int]:
 
 def main():
     spark = SparkSession.builder.appName('SparkSQL').getOrCreate()
-    data = spark.sparkContext.textFile('fk/datasets/friends.csv')
+    data = spark.sparkContext.textFile('fk/files/friends.csv')
     people = data.map(parse_csv)
 
     # Register DataFrame as a table

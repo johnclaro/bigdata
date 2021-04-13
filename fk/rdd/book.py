@@ -57,7 +57,7 @@ def switch_position(rdd: Tuple[str, int]) -> Tuple[int, str]:
 
 
 def main():
-    data = sc.textFile('fk/datasets/book.txt')
+    data = sc.textFile('fk/files/book.txt')
     rdd = data.flatMap(normalize_words) \
         .map(map_words) \
         .reduceByKey(count_words) \

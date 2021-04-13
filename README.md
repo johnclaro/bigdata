@@ -12,7 +12,7 @@ For Mac, modify `.bashrc` or `.zshrc` files
 PYSPARK_PYTHON=/usr/bin/python3
 ```
 
-Each project has a `datasets` folder inside them, e.g. `fk/datasets`
+Each project has a `files` folder inside them, e.g. `fk/files`
 
 ## Getting started
 
@@ -21,9 +21,9 @@ To run a script
 spark-submit fk/ratings.py
 ```
 
-## Datasets
+## Files
 
 Avoid committing files that are over 500KB.
 
-Download these large datasets:
-- [fk/datasets/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)
+Download these large files:
+- [fk/files/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)

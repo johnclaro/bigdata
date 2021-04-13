@@ -132,11 +132,4 @@ dmypy.json
 .vscode
 .DS_Store
 .idea
-*/datasets/*
-
-# datasets
-!fk/datasets/friends.csv
-!fk/datasets/weather.csv
-!fk/datasets/book.txt
-!fk/datasets/customers.csv
-!fk/datasets/friends-header.csv
+fk/files/ratings

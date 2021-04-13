@@ -53,7 +53,7 @@ def calculate_average(x: tuple) -> float:
 def main():
     conf = SparkConf().setMaster('local').setAppName('FriendsByAge')
     sc = SparkContext(conf=conf)
-    data = sc.textFile('fk/datasets/friends.csv')
+    data = sc.textFile('fk/files/friends.csv')
     rdd = data.map(parse_lines) \
         .mapValues(init_friends) \
         .reduceByKey(increment_friends) \

@@ -65,7 +65,7 @@ def find_lowest_temp(lowest_temp: float, next_temp: float) -> float:
 def main():
     conf = SparkConf().setMaster('local').setAppName('Weather')
     sc = SparkContext(conf=conf)
-    data = sc.textFile('fk/datasets/weather.csv')
+    data = sc.textFile('fk/files/weather.csv')
     rdd = data.map(parse_csv) \
         .filter(filter_lines) \
         .map(remove_entries) \

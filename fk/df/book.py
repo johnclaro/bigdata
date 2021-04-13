@@ -4,7 +4,7 @@ from pyspark.sql.functions import explode, split, lower, desc
 
 def main():
     spark = SparkSession.builder.appName('WordCount').getOrCreate()
-    df = spark.read.text('fk/datasets/book.txt')
+    df = spark.read.text('fk/files/book.txt')
 
     # Split the line of text into list of words then use explode to create
     # multiple rows for those list of words
