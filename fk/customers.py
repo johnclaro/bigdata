@@ -60,13 +60,14 @@ def main():
     conf = SparkConf().setMaster('local').setAppName('Customers')
     sc = SparkContext(conf=conf)
     data = sc.textFile('fk/datasets/customers.csv')
-    customers_rdd = data.map(parse_data) \
+    rdd = data.map(parse_data) \
         .map(map_spent) \
         .reduceByKey(add_spent) \
         .map(reverse_position) \
         .sortByKey()
-    for customer in customers_rdd.collect():
-        print(f'{customer[1]} \t {customer[0]:.2f}')
+    for element in rdd.collect():
+        spent, customer_id = element
+        print(f'{customer_id} \t {spent:.2f}')
 
 
 if __name__ == '__main__':
