@@ -54,10 +54,10 @@ def main():
     conf = SparkConf().setMaster('local').setAppName('FriendsByAge')
     sc = SparkContext(conf=conf)
     data = sc.textFile('fk/datasets/friends.csv')
-    friends = data.map(parse_lines).\
-        mapValues(init_friends).\
-        reduceByKey(increment_friends).\
-        mapValues(calculate_average)
+    friends = data.map(parse_lines)\
+        .mapValues(init_friends)\
+        .reduceByKey(increment_friends)\
+        .mapValues(calculate_average)
     for element in friends.collect():
         print(element)
 
