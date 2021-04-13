@@ -66,10 +66,10 @@ def main():
     conf = SparkConf().setMaster('local').setAppName('Weather')
     sc = SparkContext(conf=conf)
     data = sc.textFile('fk/datasets/weather.csv')
-    weathers = data.map(parse_csv).\
-        filter(filter_lines).\
-        map(remove_entries).\
-        reduceByKey(find_lowest_temp)
+    weathers = data.map(parse_csv)\
+        .filter(filter_lines)\
+        .map(remove_entries)\
+        .reduceByKey(find_lowest_temp)
     for element in weathers.collect():
         station, temp = element
         print(f'{station} \t{temp:.2f}F')
