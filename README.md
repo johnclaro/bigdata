@@ -27,3 +27,5 @@ Avoid committing files that are over 500KB.
 
 Download these large files:
 - [fk/files/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)
+- [fk/files/superheroes/names.txt](https://github.com/PacktPublishing/Frank-Kanes-Taming-Big-Data-with-Apache-Spark-and-Python/blob/master/Marvel-names.txt)
+- [fk/files/superheroes/graph.txt](https://github.com/PacktPublishing/Frank-Kanes-Taming-Big-Data-with-Apache-Spark-and-Python/raw/master/Marvel-graph.txt)
