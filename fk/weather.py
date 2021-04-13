@@ -1,15 +1,11 @@
 from pyspark import SparkConf, SparkContext
 
 
-conf = SparkConf().setMaster('local').setAppName('Weather')
-sc = SparkContext(conf=conf)
-
-
-def parse_lines(lines: str) -> tuple:
+def parse_csv(row: str) -> tuple:
     """Parse lines of a CSV file
 
     Args:
-        line: Line of a CSV file
+        row: Line of a CSV file
 
     Returns:
         A tuple containing
@@ -17,11 +13,11 @@ def parse_lines(lines: str) -> tuple:
             1 - Entry type
             2 - Temperature
     """
-    fields = lines.split(',')
+    fields = row.split(',')
     station = fields[0]
     entry = fields[2]
     temp = float(fields[3]) * 0.1 * (9 / 5) + 32
-    return (station, entry, temp)
+    return station, entry, temp
 
 
 def filter_lines(line: str) -> bool:
@@ -49,7 +45,7 @@ def remove_entries(line: str) -> tuple:
             1 - Temperature
     """
     station, temp = line[0], line[2]
-    return (station, temp)
+    return station, temp
 
 
 def find_lowest_temp(lowest_temp: float, next_temp: float) -> float:
@@ -66,14 +62,18 @@ def find_lowest_temp(lowest_temp: float, next_temp: float) -> float:
     return min(lowest_temp, next_temp)
 
 
-datasets = sc.textFile('fk/datasets/weather.csv')
-lines = datasets.map(parse_lines)
-min_temp = lines.filter(filter_lines)
-station_temps = min_temp.map(remove_entries)
-min_temps = station_temps.reduceByKey(find_lowest_temp)
-results = min_temps.collect()
-print('station \ttemp')
-for result in results:
-    station = result[0]
-    temp = result[1]
-    print(f'{station} \t{temp:.2f}F')
+def main():
+    conf = SparkConf().setMaster('local').setAppName('Weather')
+    sc = SparkContext(conf=conf)
+    data = sc.textFile('fk/datasets/weather.csv')
+    weathers = data.map(parse_csv).\
+        filter(filter_lines).\
+        map(remove_entries).\
+        reduceByKey(find_lowest_temp)
+    for element in weathers.collect():
+        station, temp = element
+        print(f'{station} \t{temp:.2f}F')
+
+
+if __name__ == '__main__':
+    main()

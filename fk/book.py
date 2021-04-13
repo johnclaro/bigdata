@@ -57,16 +57,16 @@ def switch_position(rdd: Tuple[str, int]) -> Tuple[int, str]:
 
 
 def main():
-    text = sc.textFile('fk/datasets/book.txt')
-    words = text.flatMap(normalize_words)
-    word_counts = words.map(map_words).reduceByKey(count_words)
-    word_counts_sorted = word_counts.map(switch_position).sortByKey()
-    results = word_counts_sorted.collect()
-    for result in results:
-        count = str(result[0])
-        word = result[1].encode('ascii', 'ignore')
+    data = sc.textFile('fk/datasets/book.txt')
+    words = data.flatMap(normalize_words).\
+        map(map_words).\
+        reduceByKey(count_words).\
+        map(switch_position).\
+        sortByKey()
+    for element in words.collect():
+        count, word = element
         if word:
-            print(f'{word}: \t\t{count}')
+            print(f'{word}: \t{count}')
 
 
 if __name__ == '__main__':

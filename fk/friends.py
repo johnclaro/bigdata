@@ -1,14 +1,13 @@
+from typing import Tuple
+
 from pyspark import SparkConf, SparkContext
 
-conf = SparkConf().setMaster('local').setAppName('FriendsByAge')
-context = SparkContext(conf=conf)
 
-
-def parse_lines(line: str) -> tuple:
+def parse_lines(line: str) -> Tuple[int, int]:
     fields = line.split(',')
     age = int(fields[2])
     friends = int(fields[3])
-    return (age, friends)
+    return age, friends
 
 
 def init_friends(friends: int) -> tuple:
@@ -22,10 +21,11 @@ def init_friends(friends: int) -> tuple:
             0 - Number of friends of an age.
             1 - Number of times this age has occured during aggregation.
     """
-    return (friends, 1)
+    return friends, 1
 
 
-def increment_friends(x: tuple, y: tuple) -> tuple:
+def increment_friends(x: Tuple[int, int],
+                      y: Tuple[int, int]) -> Tuple[int, int]:
     """Gathers all values for each age and adds each of them together.
 
     Args:
@@ -35,25 +35,32 @@ def increment_friends(x: tuple, y: tuple) -> tuple:
     Returns:
         A tuple that becomes the value for the key 'age'.
             0 - Total number of friends of an age.
-            1 - Total number of times age occured during aggregation.
+            1 - Total number of times age occurs during aggregation.
     """
     friends = x[0] + y[0]
-    occurences = x[1] + y[1]
-    return (friends, occurences)
+    occurrences = x[1] + y[1]
+    return friends, occurrences
 
 
 def calculate_average(x: tuple) -> float:
     """"Calculates average number of friends for each age."""
     friends = x[0]
-    occurences = x[1]
-    average = friends / occurences
+    occurrences = x[1]
+    average = friends / occurrences
     return average
 
 
-lines = context.textFile('fk/datasets/friends.csv')
-rdd = lines.map(parse_lines)
-totals = rdd.mapValues(init_friends).reduceByKey(increment_friends)
-averages = totals.mapValues(calculate_average)
-results = averages.collect()
-for result in results:
-    print(result)
+def main():
+    conf = SparkConf().setMaster('local').setAppName('FriendsByAge')
+    sc = SparkContext(conf=conf)
+    data = sc.textFile('fk/datasets/friends.csv')
+    friends = data.map(parse_lines).\
+        mapValues(init_friends).\
+        reduceByKey(increment_friends).\
+        mapValues(calculate_average)
+    for element in friends.collect():
+        print(element)
+
+
+if __name__ == '__main__':
+    main()
