@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, split, size, sum
+from pyspark.sql.functions import col, split, size, sum, min
 from pyspark.sql.types import (
     StructField,
     StructType,
@@ -42,23 +42,20 @@ def main():
         groupBy('id').\
         agg(
             sum('connections').alias('connections')
-        )\
+        )
 
-    most_connections = query.\
-        sort(
-            col('connections').desc(),
-        ).\
-        first()
-
-    most_names = names.\
+    least_connections = query.agg(min('connections')).first()
+    superheroes = query.\
         filter(
-            col('id') == most_connections[0]
+            col('connections') == least_connections[0]
         ).\
-        select('name').\
-        first()
+        join(names, 'id').\
+        select('name')
 
-    print(f'{most_names[0]} is the most popular '
-          f'superhero with {most_connections[1]}')
+    print(f'The following superheroes only '
+          f'have {least_connections[0]} connection(s):')
+    for index, superhero in enumerate(superheroes.collect()):
+        print(f"\t {index + 1}) {superhero[0].title()}")
 
     spark.stop()
 
