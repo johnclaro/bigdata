@@ -59,12 +59,12 @@ def reverse_position(rdd: Tuple[int, float]) -> Tuple[float, int]:
 def main():
     conf = SparkConf().setMaster('local').setAppName('Customers')
     sc = SparkContext(conf=conf)
-    customers_rdd = sc.textFile('fk/datasets/customers.csv')
-    customers_rdd = customers_rdd.map(parse_data)
-    customers_rdd = customers_rdd.map(map_spent)
-    customers_rdd = customers_rdd.reduceByKey(add_spent)
-    customers_rdd = customers_rdd.map(reverse_position)
-    customers_rdd = customers_rdd.sortByKey()
+    data = sc.textFile('fk/datasets/customers.csv')
+    customers_rdd = data.map(parse_data) \
+        .map(map_spent) \
+        .reduceByKey(add_spent) \
+        .map(reverse_position) \
+        .sortByKey()
     for customer in customers_rdd.collect():
         print(f'{customer[1]} \t {customer[0]:.2f}')
 
