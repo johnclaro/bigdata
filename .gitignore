@@ -132,4 +132,4 @@ dmypy.json
 .vscode
 .DS_Store
 .idea
-fk/files/ratings
+fk/files/movies
