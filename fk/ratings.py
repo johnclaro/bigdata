@@ -10,13 +10,10 @@ def parse_data(x):
 def main():
     conf = SparkConf().setMaster('local').setAppName('RatingsHistogram')
     sc = SparkContext(conf=conf)
-
-    lines = sc.textFile('fk/datasets/ratings/u.data')
-    ratings = lines.map(parse_data)
-    result = ratings.countByValue()
-
-    results = collections.OrderedDict(sorted(result.items()))
-    for key, value in results.items():
+    data = sc.textFile('fk/datasets/ratings/u.data')
+    rdd = data.map(parse_data).countByValue()
+    rdd = collections.OrderedDict(sorted(rdd.items()))
+    for key, value in rdd.items():
         print(f'{key} {value}')
 
 
