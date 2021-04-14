@@ -3,7 +3,7 @@ from pyspark.sql.functions import col, regexp_extract, desc
 
 
 def main():
-    spark = SparkSession.builder.appName('chess').getOrCreate()
+    spark = SparkSession.builder.appName('wins').getOrCreate()
     df = spark.read.text('datasets/jan2013.pgn')
     data = df. \
         withColumn(
