@@ -16,7 +16,7 @@ PYSPARK_PYTHON=/usr/bin/python3
 
 To run a script
 ```console
-spark-submit top_100_openings.py
+spark-submit queries/openings.py
 ```
 
 ## Datasets
