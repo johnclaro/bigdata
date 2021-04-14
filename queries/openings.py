@@ -9,27 +9,39 @@ from pyspark.sql.functions import (
 def main():
     spark = SparkSession.builder.appName('openings').getOrCreate()
     df = spark.read.text('datasets/jan2013.pgn')
-    df. \
-        withColumn(
-            'opening',
-            regexp_extract(
-                col('value'),
-                '\\[Opening "(.*?)"]',
-                1
-            ),
-        ).\
-        withColumn(
-            'game_id',
-            monotonically_increasing_id(),
-        ).\
-        select(
-            col('game_id'),
-            col('opening'),
-        ).\
-        filter(
-            col('opening') != '',
-        ).\
-        show()
+
+    headers = {
+        'opening': 'Opening',
+        'white_elo': 'WhiteElo',
+        'black_elo': 'BlackElo',
+    }
+    views = []
+
+    for header, title in headers.items():
+        view = df. \
+            withColumn(
+                header,
+                regexp_extract(
+                    col('value'),
+                    f'\\[{title} "(.*?)"]',
+                    1
+                ),
+            ).\
+            withColumn(
+                'game_id',
+                monotonically_increasing_id(),
+            ).\
+            select(
+                col('game_id'),
+                col(header),
+            ).\
+            filter(
+                col(header) != '',
+            )
+        view.show()
+        views.append(view)
+
+    views[0].join(views[1], ['game_id']).join(views[2], ['game_id']).show()
 
     spark.stop()
 
