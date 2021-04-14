@@ -1,9 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import (
-    col,
-    regexp_extract,
-    desc,
-)
+from pyspark.sql.functions import col, regexp_extract, desc
 
 
 def main():
