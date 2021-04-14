@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, regexp_extract, desc
 
 def main():
     spark = SparkSession.builder.appName('chess').getOrCreate()
-    df = spark.read.text('datasets/jun2018.pgn')
+    df = spark.read.text('datasets/jan2013.pgn')
     data = df. \
         withColumn(
             'opening',
@@ -21,11 +21,11 @@ def main():
             col('opening')
         ). \
         groupBy('opening'). \
-        count(). \
+        count().alias('frequency'). \
         sort(
             desc('count')
         )
-    data.repartition(1).write.csv('files/openings', header='true')
+    data.repartition(1).write.csv('datasets/openings', header='true')
 
     spark.stop()
 
