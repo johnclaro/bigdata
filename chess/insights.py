@@ -1,144 +1,77 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
-    split,
     col,
     regexp_extract,
-    regexp_replace,
-    collect_list,
+    monotonically_increasing_id,
+    desc,
 )
+from pyspark.sql.window import Window
 
 
 def main():
-    spark = SparkSession.builder.appName('Chess').getOrCreate()
-    spark.read.text('chess/files/test.pgn').\
-        withColumn(
-            'event',
-            regexp_extract(
-                col('value'),
-                '\\[Event "(.*?)"]',
-                1
+    spark = SparkSession.builder.appName('chess').getOrCreate()
+    df = spark.read.text('chess/files/jan2013.pgn')
+
+    headers = {
+        'event': 'Event',
+        'white': 'White',
+        'black': 'Black',
+        'result': 'Result',
+        'utc_date': 'UTCDate',
+        'utc_time': 'UTCTime',
+        'white_elo': 'WhiteElo',
+        'black_elo': 'BlackElo',
+        'white_rating_diff': 'WhiteRatingDiff',
+        'black_rating_diff': 'BlackRatingDiff',
+        'eco': 'ECO',
+        'opening': 'Opening',
+        'time_control': 'TimeControl',
+        'termination': 'Termination',
+    }
+
+    for key, value in headers.items():
+        game = df.\
+            withColumn(
+                key,
+                regexp_extract(
+                    col('value'),
+                    f'\\[{value} "(.*?)"]',
+                    1
+                )
+            ).\
+            withColumn(
+                'game_id',
+                monotonically_increasing_id(),
+            ).\
+            filter(
+                (col(key) != '') &
+                (col(key) != '1.')
+            ).\
+            select(
+                col(key),
+                col('game_id'),
             )
-        ). \
-        withColumn(
-            'site',
-            regexp_extract(
-                col('value'),
-                '\\[Site "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'white',
-            regexp_extract(
-                col('value'),
-                '\\[White "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'black',
-            regexp_extract(
-                col('value'),
-                '\\[Black "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'utc_date',
-            regexp_extract(
-                col('value'),
-                '\\[UTCDate "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'utc_time',
-            regexp_extract(
-                col('value'),
-                '\\[UTCTime "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'white_elo',
-            regexp_extract(
-                col('value'),
-                '\\[WhiteElo "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'black_elo',
-            regexp_extract(
-                col('value'),
-                '\\[BlackElo "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'white_rating_diff',
-            regexp_extract(
-                col('value'),
-                '\\[WhiteRatingDiff "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'black_rating_diff',
-            regexp_extract(
-                col('value'),
-                '\\[BlackRatingDiff "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'eco',
-            regexp_extract(
-                col('value'),
-                '\\[ECO "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'opening',
-            regexp_extract(
-                col('value'),
-                '\\[Opening "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'time_control',
-            regexp_extract(
-                col('value'),
-                '\\[TimeControl "(.*?)"]',
-                1
-            )
-        ). \
-        withColumn(
-            'termination',
-            regexp_extract(
-                col('value'),
-                '\\[Termination "(.*?)"]',
-                1
-            )
-        ). \
-        select(
-            col('event'),
-            col('site'),
-            col('white'),
-            col('black'),
-            col('utc_date'),
-            col('utc_time'),
-            col('white_elo'),
-            col('black_elo'),
-            col('white_rating_diff'),
-            col('black_rating_diff'),
-            col('eco'),
-            col('opening'),
-            col('time_control'),
-            col('termination'),
-        ).show()
+        game.createOrReplaceTempView(key)
+
+    query = """
+    SELECT event.game_id, event, white, black, utc_date, utc_time, white_elo, black_elo, white_rating_diff, black_rating_diff, eco, time_control, termination
+    FROM event
+    INNER JOIN white ON event.game_id = white.game_id
+    INNER JOIN black ON event.game_id = black.game_id
+    INNER JOIN result ON event.game_id = result.game_id
+    INNER JOIN utc_date ON event.game_id = utc_date.game_id
+    INNER JOIN utc_time ON event.game_id = utc_time.game_id
+    INNER JOIN white_elo ON event.game_id = white_elo.game_id
+    INNER JOIN black_elo ON event.game_id = black_elo.game_id
+    INNER JOIN white_rating_diff ON event.game_id = white_rating_diff.game_id
+    INNER JOIN black_rating_diff ON event.game_id = black_rating_diff.game_id
+    INNER JOIN eco ON event.game_id = eco.game_id
+    INNER JOIN opening ON event.game_id = opening.game_id
+    INNER JOIN time_control ON event.game_id = time_control.game_id
+    INNER JOIN termination ON event.game_id = termination.game_id
+    """
+    spark.sql(query).show()
+
     spark.stop()
 
 
