@@ -28,7 +28,7 @@ def top_100_openings(df: DataFrame):
         sort(
             desc('count')
         )
-    data.repartition(1).write.csv('chess/files/top_100_openings')
+    data.repartition(1).write.csv('files/top_100_openings')
 
 
 def main():
