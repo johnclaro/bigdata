@@ -1,17 +1,40 @@
 import csv
+import os
+import sys
 from collections import deque
 
 
-def main():
+def save(filename: str, games: deque, mode: str):
     columns = (
-        'Event', 'ID', 'White', 'Black', 'Result', 'UTCDate', 'UTCTime',
-        'WhiteElo', 'BlackElo', 'WhiteRatingDiff', 'BlackRatingDiff', 'ECO',
-        'Opening', 'TimeControl', 'Termination'
+        'Event',
+        'ID',
+        'White',
+        'Black',
+        'Result',
+        'UTCDate',
+        'UTCTime',
+        'WhiteElo',
+        'BlackElo',
+        'WhiteRatingDiff',
+        'BlackRatingDiff',
+        'ECO',
+        'Opening',
+        'TimeControl',
+        'Termination',
     )
-    games = deque()
-    filename = 'chess/files/july2016'
+    with open(f'{filename}.csv', mode) as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        if mode == 'w':
+            csv_writer.writerow(columns)
+        for game in games:
+            csv_writer.writerow(game)
+
+
+def find_games(filename):
+    half_mb = 500000
     with open(f'{filename}.pgn', 'r') as reader:
         lines = reader.readlines()
+        games = deque()
         game = []
         for index, line in enumerate(lines):
             key = line.split('"')[0]
@@ -25,13 +48,27 @@ def main():
                 game.append(value)
                 if key == 'Termination':
                     games.append(game)
-                    game = []
+                    print(f'({index:,} / {len(lines) - 1:,}) : {sys.getsizeof(games)}')
+                    if sys.getsizeof(games) >= half_mb:
+                        yield games
+                        games.clear()
+                    else:
+                        game = []
 
-    with open(f'{filename}.csv', 'w') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',')
-        csv_writer.writerow(columns)
-        for game in games:
-            csv_writer.writerow(game)
+
+def main():
+    filename = 'chess/files/jan2013'
+    try:
+        os.remove(f'{filename}.csv')
+    except FileNotFoundError:
+        pass
+
+    games = find_games(filename)
+    for index, games_found in enumerate(games):
+        if not index:
+            save(filename, games_found, 'w')
+        else:
+            save(filename, games_found, 'a')
 
 
 if __name__ == '__main__':

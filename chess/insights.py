@@ -1,8 +1,8 @@
-from pyspark.sql import SparkSession, Row
+from pyspark.sql import SparkSession
 
 
 def main():
-    spark = SparkSession.builder.appName('SparkSQL').getOrCreate()
+    spark = SparkSession.builder.appName('Chess').getOrCreate()
     chess = spark.\
         read.\
         option('header', 'true').\
