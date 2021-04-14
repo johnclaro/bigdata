@@ -11,6 +11,8 @@ from pyspark.sql.types import (
 def main():
     spark = SparkSession.builder.appName('Superheroes').getOrCreate()
 
+
+
     spark.stop()
 
 

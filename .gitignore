@@ -134,3 +134,4 @@ dmypy.json
 .idea
 fk/files/movies
 fk/files/superheroes
+chess/files
