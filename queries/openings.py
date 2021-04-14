@@ -1,33 +1,35 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, regexp_extract, desc
+from pyspark.sql.functions import (
+    col,
+    regexp_extract,
+    monotonically_increasing_id,
+)
 
 
 def main():
-    spark = SparkSession.builder.appName('chess').getOrCreate()
+    spark = SparkSession.builder.appName('openings').getOrCreate()
     df = spark.read.text('datasets/jan2013.pgn')
-    data = df. \
+    df. \
         withColumn(
             'opening',
             regexp_extract(
                 col('value'),
-                f'\\[Opening "(.*?)"]',
+                '\\[Opening "(.*?)"]',
                 1
             ),
-        ). \
+        ).\
+        withColumn(
+            'game_id',
+            monotonically_increasing_id(),
+        ).\
+        select(
+            col('game_id'),
+            col('opening'),
+        ).\
         filter(
             col('opening') != '',
-        ). \
-        groupBy('opening'). \
-        count().withColumnRenamed('count', 'frequency').\
-        sort(
-            desc('count')
-        )
-
-    data.\
-        repartition(1).\
-        write.\
-        mode('overwrite').\
-        csv('datasets/openings', header='true')
+        ).\
+        show()
 
     spark.stop()
 
