@@ -8,7 +8,7 @@ from pyspark.sql.functions import (
 
 def main():
     spark = SparkSession.builder.appName('chess').getOrCreate()
-    df = spark.read.text('datasets/jan2013.pgn')
+    df = spark.read.text('datasets/jun2018.pgn')
     data = df. \
         withColumn(
             'opening',
