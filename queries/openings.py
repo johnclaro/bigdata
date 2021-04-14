@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, regexp_extract, desc
+from pyspark.sql.functions import col, regexp_extract, desc, count
 
 
 def main():
@@ -18,10 +18,10 @@ def main():
             col('opening') != '',
         ). \
         select(
-            col('opening')
+            col('opening'),
         ). \
         groupBy('opening'). \
-        count().alias('frequency'). \
+        count().withColumnRenamed('count', 'frequency').\
         sort(
             desc('count')
         )
