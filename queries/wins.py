@@ -17,14 +17,15 @@ def main():
         filter(
             col('player') != '',
         ). \
-        select(
-            col('player'),
-        ). \
         groupBy('player'). \
         count().withColumnRenamed('count', 'wins').\
         sort(
             desc('wins')
-        )
+        ).\
+        replace('1-0', 'white').\
+        replace('0-1', 'black').\
+        replace('1/2-1/2', 'draw').\
+        replace('*', 'n/a')
 
     data.\
         repartition(1).\
