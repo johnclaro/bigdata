@@ -16,10 +16,10 @@ def main():
                 col('value'),
                 f'\\[Opening "(.*?)"]',
                 1
-            )
+            ),
         ). \
         filter(
-            (col('opening') != '')
+            col('opening') != '',
         ). \
         select(
             col('opening')
