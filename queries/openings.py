@@ -29,7 +29,7 @@ def main():
         sort(
             desc('count')
         )
-    data.repartition(1).write.csv('files/openings')
+    data.repartition(1).write.csv('files/openings', header='true')
 
     spark.stop()
 
