@@ -14,7 +14,7 @@ def main():
                     ecos[name] = player
 
     with open('ecos/ecos.json', 'w') as ecos_json:
-        json.dump(ecos, ecos_json, indent=4, sort_keys=True)
+        json.dump(ecos, ecos_json, indent=4, sort_keys=True, ensure_ascii=False)
 
 
 if __name__ == '__main__':
