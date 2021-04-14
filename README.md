@@ -1,6 +1,6 @@
-# bigdata
+# chess
 
-Explore datasets using PySpark
+Mining chess data using PySpark
 
 ## Setup
 
@@ -12,20 +12,16 @@ For Mac, modify `.bashrc` or `.zshrc` files
 PYSPARK_PYTHON=/usr/bin/python3
 ```
 
-Each project has a `files` folder inside them, e.g. `fk/files`
-
 ## Getting started
 
 To run a script
 ```console
-spark-submit fk/ratings.py
+spark-submit top_100_openings.py
 ```
 
 ## Files
 
-Avoid committing files that are over 500KB.
+Avoid committing large files.
 
-Download these large files:
-- [fk/files/ratings](https://files.grouplens.org/datasets/movielens/ml-100k.zip)
-- [fk/files/superheroes/names.txt](https://github.com/PacktPublishing/Frank-Kanes-Taming-Big-Data-with-Apache-Spark-and-Python/blob/master/Marvel-names.txt)
-- [fk/files/superheroes/graph.txt](https://github.com/PacktPublishing/Frank-Kanes-Taming-Big-Data-with-Apache-Spark-and-Python/raw/master/Marvel-graph.txt)
+Chess datasets can be found here:
+- (Lichess)(https://database.lichess.org/)
