@@ -132,6 +132,4 @@ dmypy.json
 .vscode
 .DS_Store
 .idea
-fk/files/movies
-fk/files/superheroes
-chess/files
+files/
