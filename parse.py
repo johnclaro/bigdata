@@ -54,7 +54,7 @@ def parse(filename):
 
 
 def main():
-    filename = 'chess/files/jan2013'
+    filename = 'chess/datasets/jan2013'
     one_gb = 1073741824
     size = os.path.getsize(f'{filename}.pgn')
     if size >= one_gb:

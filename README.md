@@ -19,9 +19,7 @@ To run a script
 spark-submit top_100_openings.py
 ```
 
-## Files
-
-Avoid committing large files.
+## Datasets
 
 Chess datasets can be found here:
 - [Lichess](https://database.lichess.org/)

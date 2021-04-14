@@ -28,12 +28,12 @@ def top_100_openings(df: DataFrame):
         sort(
             desc('count')
         )
-    data.repartition(1).write.csv('files/top_100_openings')
+    data.repartition(1).write.csv('files/openings')
 
 
 def main():
     spark = SparkSession.builder.appName('chess').getOrCreate()
-    df = spark.read.text('chess/files/jan2013.pgn')
+    df = spark.read.text('chess/datasets/jan2013.pgn')
     top_100_openings(df)
 
     spark.stop()
