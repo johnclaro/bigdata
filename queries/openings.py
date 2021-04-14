@@ -17,9 +17,6 @@ def main():
         filter(
             col('opening') != '',
         ). \
-        select(
-            col('opening'),
-        ). \
         groupBy('opening'). \
         count().withColumnRenamed('count', 'frequency').\
         sort(
