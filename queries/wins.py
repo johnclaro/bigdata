@@ -7,30 +7,30 @@ def main():
     df = spark.read.text('datasets/jan2013.pgn')
     data = df. \
         withColumn(
-            'opening',
+            'player',
             regexp_extract(
                 col('value'),
-                f'\\[Opening "(.*?)"]',
+                f'\\[Result "(.*?)"]',
                 1
             ),
         ). \
         filter(
-            col('opening') != '',
+            col('player') != '',
         ). \
         select(
-            col('opening'),
+            col('player'),
         ). \
-        groupBy('opening'). \
-        count().withColumnRenamed('count', 'frequency').\
+        groupBy('player'). \
+        count().withColumnRenamed('count', 'wins').\
         sort(
-            desc('count')
+            desc('wins')
         )
 
     data.\
         repartition(1).\
         write.\
         mode('overwrite').\
-        csv('datasets/openings', header='true')
+        csv('datasets/wins', header='true')
 
     spark.stop()
 
