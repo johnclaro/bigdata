@@ -24,4 +24,4 @@ spark-submit top_100_openings.py
 Avoid committing large files.
 
 Chess datasets can be found here:
-- (Lichess)(https://database.lichess.org/)
+- [Lichess](https://database.lichess.org/)
