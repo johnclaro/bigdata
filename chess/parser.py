@@ -3,8 +3,10 @@ import os
 import sys
 from collections import deque
 
+from tqdm import tqdm
 
-def save(filename: str, games: deque, mode: str):
+
+def save(filename: str, games: deque):
     columns = (
         'Event',
         'ID',
@@ -22,21 +24,19 @@ def save(filename: str, games: deque, mode: str):
         'TimeControl',
         'Termination',
     )
-    with open(f'{filename}.csv', mode) as csv_file:
+    with open(f'{filename}.csv', 'w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
-        if mode == 'w':
-            csv_writer.writerow(columns)
+        csv_writer.writerow(columns)
         for game in games:
             csv_writer.writerow(game)
 
 
-def find_games(filename):
-    half_mb = 500000
+def parse(filename):
     with open(f'{filename}.pgn', 'r') as reader:
         lines = reader.readlines()
         games = deque()
         game = []
-        for index, line in enumerate(lines):
+        for line in tqdm(lines):
             key = line.split('"')[0]
             if '[' in key and '1. ' not in key[:3]:
                 key = key.replace('[', '').replace(' ', '')
@@ -48,27 +48,18 @@ def find_games(filename):
                 game.append(value)
                 if key == 'Termination':
                     games.append(game)
-                    print(f'({index:,} / {len(lines) - 1:,}) : {sys.getsizeof(games)}')
-                    if sys.getsizeof(games) >= half_mb:
-                        yield games
-                        games.clear()
-                    else:
-                        game = []
+                    game = []
+
+    save(filename, games)
 
 
 def main():
     filename = 'chess/files/jan2013'
-    try:
-        os.remove(f'{filename}.csv')
-    except FileNotFoundError:
-        pass
-
-    games = find_games(filename)
-    for index, games_found in enumerate(games):
-        if not index:
-            save(filename, games_found, 'w')
-        else:
-            save(filename, games_found, 'a')
+    one_gb = 1073741824
+    size = os.path.getsize(f'{filename}.pgn')
+    if size >= one_gb:
+        sys.exit('File exceeds 1GB, closing...')
+    parse(filename)
 
 
 if __name__ == '__main__':
