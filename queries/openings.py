@@ -38,7 +38,7 @@ def set_elo_range(white_elo: f.col, black_elo: f.col) -> str:
 def main():
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/test.pgn')
+    data = spark.read.text('datasets/jan2013.pgn')
 
     headers = {
         'opening': 'Opening',
@@ -72,6 +72,26 @@ def main():
 
     set_elo_range_udf = f.udf(set_elo_range)
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
+    openings_df = df.\
+        groupBy(
+            f.col('opening')
+        ).\
+        count().\
+        orderBy(
+            f.desc(
+                f.col('count')
+            )
+        ).\
+        select(
+            f.col('opening')
+        ).\
+        limit(10)
+
+    openings = [
+        opening[0]
+        for opening in openings_df.collect()
+    ]
+
     df = df.\
         withColumn(
             'elo_range',
@@ -85,17 +105,21 @@ def main():
             f.col('opening'),
             f.col('elo_range'),
         ).\
+        filter(
+            f.col('opening').isin(openings)
+        ).\
         groupBy(
             f.col('opening'),
         ).\
         pivot('elo_range').\
-        count()
+        count().\
+        na.\
+        fill(0)
 
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
     df.show(10, truncate=False)
-
     # df. \
     #     repartition(1). \
     #     write. \
