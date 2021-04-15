@@ -1,11 +1,12 @@
+from timeit import default_timer as timer
+from datetime import timedelta
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, regexp_extract, desc
 
 
-def main():
-    spark = SparkSession.builder.appName('wins').getOrCreate()
-    df = spark.read.text('datasets/93mb.pgn')
-    data = df. \
+def extract(data):
+    df = data. \
         withColumn(
             'player',
             regexp_extract(
@@ -27,11 +28,26 @@ def main():
         replace('1/2-1/2', 'draw').\
         replace('*', 'n/a')
 
-    data.\
-        repartition(1).\
-        write.\
-        mode('overwrite').\
-        csv('datasets/wins', header='true')
+    return df
+
+
+def main():
+    start = timer()
+    spark = SparkSession.builder.appName('wins').getOrCreate()
+    data = spark.read.text('datasets/43gb.pgn')
+    df = extract(data)
+    df.repartition(4).write.mode('overwrite').parquet('datasets/wins')
+
+    print('-------------------------------------')
+    extract_timer = timer()
+    print(f'Extracting took {timedelta(seconds=extract_timer - start)}')
+    print('-------------------------------------')
+
+    # df.show(truncate=False)
+    df.repartition(4).write.mode('overwrite').parquet('datasets/wins')
+    print('-------------------------------------')
+    print(f'Saving / showing took {timedelta(seconds=timer() - extract_timer)}')
+    print('-------------------------------------')
 
     spark.stop()
 

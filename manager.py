@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def main():
-    schema = 'openings'
+    schema = 'wins'
     folder_path = f'datasets/{schema}'
 
     dfs = []
