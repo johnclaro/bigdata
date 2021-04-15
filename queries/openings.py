@@ -136,7 +136,7 @@ def extract(data):
 def main():
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/1gb.pgn')
+    data = spark.read.text('datasets/43gb.pgn')
     df = extract(data)
 
     print('-------------------------------------')
