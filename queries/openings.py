@@ -1,58 +1,74 @@
 from timeit import default_timer as timer
 from datetime import timedelta
-from functools import reduce
-from operator import add
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
+from pyspark.ml.feature import Bucketizer
+from pyspark.sql.types import IntegerType, StringType
 
+SPLITS = [
+    0,
+    1200,
+    1400,
+    1600,
+    1800,
+    2000,
+    2200,
+    2300,
+    2400,
+    2500,
+    2700,
+    9999,
+]
 
-def set_elo_range(white_elo: f.col, black_elo: f.col) -> str:
-    white_elo, black_elo = int(white_elo), int(black_elo)
-    elo = (white_elo + black_elo) / 2
-    elo_range = 'n/a'
-    if elo < 1200:
-        elo_range = '<1200'
-    elif 1200 <= elo <= 1400:
-        elo_range = '1200-1400'
-    elif 1400 <= elo <= 1600:
-        elo_range = '1400-1600'
-    elif 1600 <= elo <= 1800:
-        elo_range = '1600-1800'
-    elif 1800 <= elo <= 2000:
-        elo_range = '1800-2000'
-    elif 2000 <= elo <= 2200:
-        elo_range = '2000-2200'
-    elif 2200 <= elo <= 2300:
-        elo_range = '2200-2300'
-    elif 2300 <= elo <= 2400:
-        elo_range = '2300-2400'
-    elif 2400 <= elo <= 2500:
-        elo_range = '2400-2500'
-    elif 2500 <= elo <= 2700:
-        elo_range = '2500-2700'
-    elif 2700 <= elo:
-        elo_range = '2700+'
-
-    return elo_range
+LABELS = (
+    '<1200',
+    '1200-1400',
+    '1400-1600',
+    '1600-1800',
+    '1800-2000',
+    '2000-2200',
+    '2200-2300',
+    '2300-2400',
+    '2400-2500',
+    '2500-2700',
+    '2700+',
+)
 
 
 def extract(data):
     headers = {
-        'opening': 'Opening',
-        'white_elo': 'WhiteElo',
-        'black_elo': 'BlackElo',
+        'opening': {
+            'title': 'Opening',
+            'data_type': StringType,
+        },
+        'white_elo': {
+            'title': 'WhiteElo',
+            'data_type': IntegerType,
+        },
+        'black_elo': {
+            'title': 'BlackElo',
+            'data_type': IntegerType,
+        },
     }
     views = []
 
-    for header, title in headers.items():
+    for header, info in headers.items():
+        filters = ()
+        if info['data_type'] == IntegerType:
+            filters = (f.col(header).isNotNull())
+        elif info['data_type'] == StringType:
+            filters = (f.col(header) != '')
+
         view = data. \
             withColumn(
                 header,
                 f.regexp_extract(
                     f.col('value'),
-                    f'\\[{title} "(.*?)"]',
+                    f'\\[{info["title"]} "(.*?)"]',
                     1
+                ).cast(
+                    info['data_type']()
                 ),
             ).\
             withColumn(
@@ -63,43 +79,27 @@ def extract(data):
                 f.col('game_id'),
                 f.col(header),
             ).\
-            filter(
-                (f.col(header) != '') & (f.col(header) != '?'),
-            )
+            filter(filters)
         views.append(view)
 
-    set_elo_range_udf = f.udf(set_elo_range)
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    df = df.\
+    bucketizer = Bucketizer(
+        splits=SPLITS,
+        inputCol='white_elo',
+        outputCol='count',
+    )
+    df = bucketizer.transform(df)
+    label_array = f.array(
+        *(f.lit(label) for label in LABELS)
+    )
+    df.\
         withColumn(
             'elo_range',
-            set_elo_range_udf(
-                f.col('white_elo'),
-                f.col('black_elo'),
+            label_array.getItem(
+                f.col('count').cast('integer')
             )
         ).\
-        select(
-            f.col('game_id'),
-            f.col('opening'),
-            f.col('elo_range'),
-        ).\
-        groupBy(
-            f.col('opening'),
-        ).\
-        pivot('elo_range').\
-        count().\
-        na.\
-        fill(0)
-
-    df = df.\
-        withColumn(
-            'total',
-            reduce(add, [f.col(x) for x in df.columns[1:]])
-        ).\
-        orderBy(
-            f.desc(f.col('total'))
-        ).\
-        limit(10)
+        show(10, False)
 
     return df
 
@@ -107,12 +107,12 @@ def extract(data):
 def main():
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/jan2013.pgn')
+    data = spark.read.text('datasets/test.pgn')
     df = extract(data)
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
-    df.show(10, truncate=False)
+    # df.show(10, truncate=False)
 
     # df. \
     #     repartition(1). \
