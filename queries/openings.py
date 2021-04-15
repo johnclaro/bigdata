@@ -1,3 +1,6 @@
+from operator import add
+from functools import reduce
+
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 
@@ -45,7 +48,7 @@ def set_elo_range(opening, white_elo, black_elo):
 
 def main():
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    df = spark.read.text('datasets/jan2013.pgn')
+    df = spark.read.text('datasets/test.pgn')
 
     headers = {
         'opening': 'Opening',
@@ -78,9 +81,8 @@ def main():
         views.append(view)
 
     elo_range = f.udf(set_elo_range)
-
-    combined = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    combined = combined.\
+    openings = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
+    openings = openings.\
         withColumn(
             'elo_range',
             elo_range(
@@ -98,11 +100,32 @@ def main():
             f.col('opening'),
             f.col('elo_range'),
         ).\
-        count().withColumnRenamed('count', 'frequency'). \
+        pivot('elo_range').\
+        count().\
+        na.fill(0)
+
+    columns = [
+        column
+        for column in openings.columns
+        if column not in ('opening', 'elo_range')
+    ]
+
+    openings = openings.\
+        withColumn(
+            'total',
+            reduce(
+                add,
+                [f.col(column) for column in columns]
+            ),
+        ).\
         orderBy(
-            f.desc(f.col('frequency')),
-        )
-    combined.show(truncate=False)
+            f.desc(
+                f.col('total'),
+            ),
+        ).\
+        select('opening', *columns)
+
+    openings.show(truncate=False)
 
     spark.stop()
 
