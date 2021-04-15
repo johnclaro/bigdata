@@ -94,7 +94,16 @@ def main():
             f.col('opening'),
             f.col('elo_range'),
         ).\
-        orderBy(f.col('game_id'))
+        groupBy(
+            f.col('opening'),
+            f.col('elo_range'),
+        ).\
+        count().withColumnRenamed('count', 'frequency'). \
+        orderBy(
+            f.desc(
+                f.col('frequency'),
+            ),
+        )
     combined.show(truncate=False)
 
     spark.stop()
