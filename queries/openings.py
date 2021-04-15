@@ -91,7 +91,9 @@ def main():
         pivot('elo_range').\
         count()
 
+    print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
+    print('-------------------------------------')
     df.show(10, truncate=False)
 
     # df. \
