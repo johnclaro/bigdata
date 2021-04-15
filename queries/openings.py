@@ -48,7 +48,7 @@ def set_elo_range(opening, white_elo, black_elo):
 
 def main():
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    df = spark.read.text('datasets/jan2013.pgn')
+    data = spark.read.text('datasets/jan2013.pgn')
 
     headers = {
         'opening': 'Opening',
@@ -58,7 +58,7 @@ def main():
     views = []
 
     for header, title in headers.items():
-        view = df. \
+        view = data. \
             withColumn(
                 header,
                 f.regexp_extract(
@@ -81,8 +81,8 @@ def main():
         views.append(view)
 
     elo_range = f.udf(set_elo_range)
-    openings = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    openings = openings.\
+    df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
+    df = df.\
         withColumn(
             'elo_range',
             elo_range(
@@ -98,7 +98,6 @@ def main():
         ).\
         groupBy(
             f.col('opening'),
-            f.col('elo_range'),
         ).\
         pivot('elo_range').\
         count().\
@@ -106,11 +105,11 @@ def main():
 
     columns = [
         column
-        for column in openings.columns
+        for column in df.columns
         if column not in ('opening', 'elo_range')
     ]
 
-    openings = openings.\
+    df = df.\
         withColumn(
             'total',
             reduce(
@@ -120,8 +119,7 @@ def main():
         ).\
         select(
             'opening',
-            *columns,
-            'total'
+            *columns
         ).\
         orderBy(
             f.desc(
@@ -129,7 +127,11 @@ def main():
             ),
         )
 
-    openings.show(truncate=False)
+    df. \
+        repartition(1). \
+        write. \
+        mode('overwrite'). \
+        csv('datasets/openings', header='true')
 
     spark.stop()
 
