@@ -1,7 +1,15 @@
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 
-from ecos import get_opening_player
+from helpers import ecos
+
+
+def get_opening_player(opening: str) -> str:
+    try:
+        player = ecos[opening]
+    except KeyError:
+        player = 'white'
+    return player
 
 
 def set_elo_range(opening, white_elo, black_elo):
