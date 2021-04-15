@@ -17,7 +17,7 @@ def main():
     df = pd.concat(dfs)
 
     if schema == 'openings':
-        df.sort_values(by='total', ascending=False)
+        df = df.sort_values(by='total', ascending=False)
 
     df.to_csv(csv_file, index=False)
     print(f'Saved {csv_file}')
