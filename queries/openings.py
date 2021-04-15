@@ -5,7 +5,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 
 
-def set_elo_range(white_elo: int, black_elo: int) -> str:
+def set_elo_range(white_elo: f.col, black_elo: f.col) -> str:
     white_elo, black_elo = int(white_elo), int(black_elo)
     elo = (white_elo + black_elo) / 2
     elo_range = 'n/a'
