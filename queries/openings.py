@@ -1,12 +1,16 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import (
-    col,
-    regexp_extract,
-    monotonically_increasing_id,
-    count,
-    udf,
-    desc,
-)
+from pyspark.sql import functions as F
+
+
+from ecos import ecos
+
+
+def set_player(opening):
+    try:
+        player = ecos[opening]
+    except KeyError:
+        player = 'white'
+    return player
 
 
 def main():
@@ -24,49 +28,28 @@ def main():
         view = df. \
             withColumn(
                 header,
-                regexp_extract(
-                    col('value'),
+                F.regexp_extract(
+                    F.col('value'),
                     f'\\[{title} "(.*?)"]',
                     1
                 ),
             ).\
             withColumn(
                 'game_id',
-                monotonically_increasing_id(),
+                F.monotonically_increasing_id(),
             ).\
             select(
-                col('game_id'),
-                col(header),
+                F.col('game_id'),
+                F.col(header),
             ).\
             filter(
-                col(header) != '',
+                (F.col(header) != '') & (F.col(header) != '?'),
             )
         views.append(view)
 
-    elo_below_1200 = udf(lambda elo: '1' if int(elo) < 1200 else '0')
-    elo_1200_1400 = udf(lambda elo: '1' if 1200 <= int(elo) < 1400 else '0')
-    elo_1400_1600 = udf(lambda elo: '1' if 1400 <= int(elo) < 1600 else '0')
+    # player = udf(set_player)
 
     combined = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    combined = combined.\
-        withColumn(
-            '<1200',
-            elo_below_1200(combined.white_elo)
-        ).\
-        withColumn(
-            '1200-1400',
-            elo_1200_1400(combined.white_elo)
-        ).\
-        withColumn(
-            '1400-1600',
-            elo_1400_1600(combined.white_elo)
-        ).\
-        select(
-            col('opening'),
-            col('<1200'),
-            col('1200-1400'),
-            col('1400-1600'),
-        )
 
     combined.show(truncate=False)
 
