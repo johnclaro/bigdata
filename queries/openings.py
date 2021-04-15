@@ -1,5 +1,7 @@
 from timeit import default_timer as timer
 from datetime import timedelta
+from functools import reduce
+from operator import add
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
@@ -72,26 +74,6 @@ def main():
 
     set_elo_range_udf = f.udf(set_elo_range)
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    openings_df = df.\
-        groupBy(
-            f.col('opening')
-        ).\
-        count().\
-        orderBy(
-            f.desc(
-                f.col('count')
-            )
-        ).\
-        select(
-            f.col('opening')
-        ).\
-        limit(10)
-
-    openings = [
-        opening[0]
-        for opening in openings_df.collect()
-    ]
-
     df = df.\
         withColumn(
             'elo_range',
@@ -105,9 +87,6 @@ def main():
             f.col('opening'),
             f.col('elo_range'),
         ).\
-        filter(
-            f.col('opening').isin(openings)
-        ).\
         groupBy(
             f.col('opening'),
         ).\
@@ -116,10 +95,21 @@ def main():
         na.\
         fill(0)
 
+    df = df.\
+        withColumn(
+            'total',
+            reduce(add, [f.col(x) for x in df.columns[1:]])
+        ).\
+        orderBy(
+            f.desc(f.col('total'))
+        ).\
+        limit(10)
+
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
     df.show(10, truncate=False)
+
     # df. \
     #     repartition(1). \
     #     write. \
