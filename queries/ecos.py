@@ -3061,3 +3061,11 @@ ecos = {
     "Zukertort Opening: Wade Defense, Chigorin Plan": "black",
     "Zukertort Opening: Ware Defense": "black"
 }
+
+
+def get_opening_player(opening: str) -> str:
+    try:
+        player = ecos[opening]
+    except KeyError:
+        player = 'white'
+    return player
