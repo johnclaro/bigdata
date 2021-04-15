@@ -48,7 +48,7 @@ def set_elo_range(opening, white_elo, black_elo):
 
 def main():
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    df = spark.read.text('datasets/test.pgn')
+    df = spark.read.text('datasets/jan2013.pgn')
 
     headers = {
         'opening': 'Opening',
@@ -118,12 +118,16 @@ def main():
                 [f.col(column) for column in columns]
             ),
         ).\
+        select(
+            'opening',
+            *columns,
+            'total'
+        ).\
         orderBy(
             f.desc(
                 f.col('total'),
             ),
-        ).\
-        select('opening', *columns)
+        )
 
     openings.show(truncate=False)
 
