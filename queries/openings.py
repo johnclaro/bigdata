@@ -6,7 +6,7 @@ from operator import add
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 from pyspark.ml.feature import Bucketizer
-from pyspark.sql.types import IntegerType, StringType
+from pyspark.sql.types import IntegerType, StringType, StructField
 
 SPLITS = [
     0,
@@ -24,7 +24,7 @@ SPLITS = [
 ]
 
 LABELS = (
-    '<1200',
+    '0-1200',
     '1200-1400',
     '1400-1600',
     '1600-1800',
@@ -39,38 +39,38 @@ LABELS = (
 
 
 def extract(data):
-    headers = {
+    schema = {
         'opening': {
-            'title': 'Opening',
+            'name': 'Opening',
             'data_type': StringType,
         },
         'white_elo': {
-            'title': 'WhiteElo',
+            'name': 'WhiteElo',
             'data_type': IntegerType,
         },
         'black_elo': {
-            'title': 'BlackElo',
+            'name': 'BlackElo',
             'data_type': IntegerType,
         },
     }
     views = []
 
-    for header, info in headers.items():
+    for column, field in schema.items():
         filters = ()
-        if info['data_type'] == IntegerType:
-            filters = (f.col(header).isNotNull())
-        elif info['data_type'] == StringType:
-            filters = (f.col(header) != '')
+        if field['data_type'] == IntegerType:
+            filters = (f.col(column).isNotNull())
+        elif field['data_type'] == StringType:
+            filters = (f.col(column) != '')
 
         view = data. \
             withColumn(
-                header,
+                column,
                 f.regexp_extract(
                     f.col('value'),
-                    f'\\[{info["title"]} "(.*?)"]',
+                    f'\\[{field["name"]} "(.*?)"]',
                     1
                 ).cast(
-                    info['data_type']()
+                    field['data_type']()
                 ),
             ).\
             withColumn(
@@ -79,25 +79,26 @@ def extract(data):
             ).\
             select(
                 f.col('game_id'),
-                f.col(header),
+                f.col(column),
             ).\
             filter(filters)
         views.append(view)
 
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
-    bucketizer = Bucketizer(
+
+    buckets = Bucketizer(
         splits=SPLITS,
         inputCol='white_elo',
         outputCol='elo_range_id',
     )
-    df = bucketizer.transform(df)
-    label_array = f.array(
+    df = buckets.transform(df)
+    labels = f.array(
         *(f.lit(label) for label in LABELS)
     )
     df = df.\
         withColumn(
             'elo_range',
-            label_array.getItem(
+            labels.getItem(
                 f.col('elo_range_id').cast('integer')
             )
         ).\
@@ -110,7 +111,10 @@ def extract(data):
     df = df. \
         withColumn(
             'total',
-            reduce(add, [f.col(x) for x in df.columns[1:]])
+            reduce(
+                add,
+                [f.col(x) for x in df.columns[1:]],
+            )
         ). \
         orderBy(
             f.desc(
@@ -128,15 +132,18 @@ def main():
     data = spark.read.text('datasets/jan2013.pgn')
     df = extract(data)
     print('-------------------------------------')
-    print(f'{timedelta(seconds=timer() - start)}')
+    print(f'Extracting took {timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
-    df.show(10, truncate=False)
 
+    df.show(10, truncate=False)
     # df. \
     #     repartition(1). \
     #     write. \
     #     mode('overwrite'). \
     #     csv('datasets/openings', header='true')
+    print('-------------------------------------')
+    print(f'Saving / showing took {timedelta(seconds=timer() - start)}')
+    print('-------------------------------------')
 
     spark.stop()
 
