@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql import functions as F
+from pyspark.sql import functions as f
 
 from ecos import get_opening_player
 
@@ -50,43 +50,43 @@ def main():
         view = df. \
             withColumn(
                 header,
-                F.regexp_extract(
-                    F.col('value'),
+                f.regexp_extract(
+                    f.col('value'),
                     f'\\[{title} "(.*?)"]',
                     1
                 ),
             ).\
             withColumn(
                 'game_id',
-                F.monotonically_increasing_id(),
+                f.monotonically_increasing_id(),
             ).\
             select(
-                F.col('game_id'),
-                F.col(header),
+                f.col('game_id'),
+                f.col(header),
             ).\
             filter(
-                (F.col(header) != '') & (F.col(header) != '?'),
+                (f.col(header) != '') & (f.col(header) != '?'),
             )
         views.append(view)
 
-    elo_range = F.udf(set_elo_range)
+    elo_range = f.udf(set_elo_range)
 
     combined = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
     combined = combined.\
         withColumn(
             'elo_range',
             elo_range(
-                F.col('opening'),
-                F.col('white_elo'),
-                F.col('black_elo'),
+                f.col('opening'),
+                f.col('white_elo'),
+                f.col('black_elo'),
             )
         ).\
         select(
-            F.col('game_id'),
-            F.col('opening'),
-            F.col('elo_range'),
+            f.col('game_id'),
+            f.col('opening'),
+            f.col('elo_range'),
         ).\
-        orderBy(F.col('game_id'))
+        orderBy(f.col('game_id'))
     combined.show(truncate=False)
 
     spark.stop()
