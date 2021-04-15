@@ -86,9 +86,16 @@ def extract(data):
 
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
 
+    average_func = sum(x for x in [f.col('white_elo'), f.col('black_elo')]) / 2
+    df = df.\
+        withColumn(
+            'elo',
+            average_func
+        )
+
     buckets = Bucketizer(
         splits=SPLITS,
-        inputCol='white_elo',
+        inputCol='elo',
         outputCol='elo_range_id',
     )
     df = buckets.transform(df)
@@ -131,8 +138,10 @@ def main():
     spark = SparkSession.builder.appName('openings').getOrCreate()
     data = spark.read.text('datasets/jan2013.pgn')
     df = extract(data)
+
     print('-------------------------------------')
-    print(f'Extracting took {timedelta(seconds=timer() - start)}')
+    extract_timer = timer()
+    print(f'Extracting took {timedelta(seconds=extract_timer - start)}')
     print('-------------------------------------')
 
     df.show(10, truncate=False)
@@ -142,7 +151,7 @@ def main():
     #     mode('overwrite'). \
     #     csv('datasets/openings', header='true')
     print('-------------------------------------')
-    print(f'Saving / showing took {timedelta(seconds=timer() - start)}')
+    print(f'Saving / showing took {timedelta(seconds=timer() - extract_timer)}')
     print('-------------------------------------')
 
     spark.stop()
