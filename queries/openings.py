@@ -18,27 +18,27 @@ def set_elo_range(opening, white_elo, black_elo):
     elo = int(elo)
     elo_range = 'n/a'
     if elo < 1200:
-        elo_range = 'below_1200'
+        elo_range = '<1200'
     elif 1200 <= elo <= 1400:
-        elo_range = '1200_1400'
+        elo_range = '1200-1400'
     elif 1400 <= elo <= 1600:
-        elo_range = '1400_1600'
+        elo_range = '1400-1600'
     elif 1600 <= elo <= 1800:
-        elo_range = '1600_1800'
+        elo_range = '1600-1800'
     elif 1800 <= elo <= 2000:
-        elo_range = '1800_2000'
+        elo_range = '1800-2000'
     elif 2000 <= elo <= 2200:
-        elo_range = '2000_2200'
+        elo_range = '2000-2200'
     elif 2200 <= elo <= 2300:
-        elo_range = '2200_2300'
+        elo_range = '2200-2300'
     elif 2300 <= elo <= 2400:
-        elo_range = '2300_2400'
+        elo_range = '2300-2400'
     elif 2400 <= elo <= 2500:
-        elo_range = '2400_2500'
+        elo_range = '2400-2500'
     elif 2500 <= elo <= 2700:
-        elo_range = '2500_2700'
+        elo_range = '2500-2700'
     elif elo >= 2700:
-        elo_range = 'above_2700'
+        elo_range = '2700+'
 
     return elo_range
 
@@ -100,9 +100,7 @@ def main():
         ).\
         count().withColumnRenamed('count', 'frequency'). \
         orderBy(
-            f.desc(
-                f.col('frequency'),
-            ),
+            f.desc(f.col('frequency')),
         )
     combined.show(truncate=False)
 
