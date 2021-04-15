@@ -1,5 +1,7 @@
 from timeit import default_timer as timer
 from datetime import timedelta
+from functools import reduce
+from operator import add
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
@@ -105,6 +107,18 @@ def extract(data):
         na.\
         fill(0)
 
+    df = df. \
+        withColumn(
+            'total',
+            reduce(add, [f.col(x) for x in df.columns[1:]])
+        ). \
+        orderBy(
+            f.desc(
+                f.col('total')
+            )
+        ). \
+        limit(10)
+
     return df
 
 
@@ -116,7 +130,7 @@ def main():
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
-    df.show(5, truncate=False)
+    df.show(10, truncate=False)
 
     # df. \
     #     repartition(1). \
