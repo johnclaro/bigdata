@@ -37,11 +37,7 @@ def set_elo_range(white_elo: f.col, black_elo: f.col) -> str:
     return elo_range
 
 
-def main():
-    start = timer()
-    spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/jan2013.pgn')
-
+def extract(data):
     headers = {
         'opening': 'Opening',
         'white_elo': 'WhiteElo',
@@ -105,6 +101,14 @@ def main():
         ).\
         limit(10)
 
+    return df
+
+
+def main():
+    start = timer()
+    spark = SparkSession.builder.appName('openings').getOrCreate()
+    data = spark.read.text('datasets/jan2013.pgn')
+    df = extract(data)
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
