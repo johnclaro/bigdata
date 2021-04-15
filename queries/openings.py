@@ -1,5 +1,6 @@
-from operator import add
-from functools import reduce
+import datetime
+from timeit import default_timer as timer
+from datetime import timedelta
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
@@ -47,8 +48,9 @@ def set_elo_range(opening, white_elo, black_elo):
 
 
 def main():
+    start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/jan2013.pgn')
+    data = spark.read.text('datasets/test.pgn')
 
     headers = {
         'opening': 'Opening',
@@ -100,38 +102,16 @@ def main():
             f.col('opening'),
         ).\
         pivot('elo_range').\
-        count().\
-        na.fill(0)
+        count()
 
-    columns = [
-        column
-        for column in df.columns
-        if column not in ('opening', 'elo_range')
-    ]
+    print(f'{timedelta(seconds=timer() - start)}')
+    df.show(10, truncate=False)
 
-    df = df.\
-        withColumn(
-            'total',
-            reduce(
-                add,
-                [f.col(column) for column in columns]
-            ),
-        ).\
-        select(
-            'opening',
-            *columns
-        ).\
-        orderBy(
-            f.desc(
-                f.col('total'),
-            ),
-        )
-
-    df. \
-        repartition(1). \
-        write. \
-        mode('overwrite'). \
-        csv('datasets/openings', header='true')
+    # df. \
+    #     repartition(1). \
+    #     write. \
+    #     mode('overwrite'). \
+    #     csv('datasets/openings', header='true')
 
     spark.stop()
 
