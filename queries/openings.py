@@ -136,7 +136,7 @@ def extract(data):
 def main():
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/jan2013.pgn')
+    data = spark.read.text('datasets/1gb.pgn')
     df = extract(data)
 
     print('-------------------------------------')
@@ -144,12 +144,8 @@ def main():
     print(f'Extracting took {timedelta(seconds=extract_timer - start)}')
     print('-------------------------------------')
 
-    df.show(10, truncate=False)
-    # df. \
-    #     repartition(1). \
-    #     write. \
-    #     mode('overwrite'). \
-    #     csv('datasets/openings', header='true')
+    # df.show(10, truncate=False)
+    df.repartition(4).write.mode('overwrite').parquet('datasets/openings')
     print('-------------------------------------')
     print(f'Saving / showing took {timedelta(seconds=timer() - extract_timer)}')
     print('-------------------------------------')

@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, regexp_extract, desc
 
 def main():
     spark = SparkSession.builder.appName('wins').getOrCreate()
-    df = spark.read.text('datasets/jan2013.pgn')
+    df = spark.read.text('datasets/93mb.pgn')
     data = df. \
         withColumn(
             'player',
