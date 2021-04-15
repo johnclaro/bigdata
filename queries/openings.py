@@ -86,20 +86,24 @@ def extract(data):
     bucketizer = Bucketizer(
         splits=SPLITS,
         inputCol='white_elo',
-        outputCol='count',
+        outputCol='elo_range_id',
     )
     df = bucketizer.transform(df)
     label_array = f.array(
         *(f.lit(label) for label in LABELS)
     )
-    df.\
+    df = df.\
         withColumn(
             'elo_range',
             label_array.getItem(
-                f.col('count').cast('integer')
+                f.col('elo_range_id').cast('integer')
             )
         ).\
-        show(10, False)
+        groupBy('opening').\
+        pivot('elo_range').\
+        count().\
+        na.\
+        fill(0)
 
     return df
 
@@ -107,12 +111,12 @@ def extract(data):
 def main():
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/test.pgn')
+    data = spark.read.text('datasets/jan2013.pgn')
     df = extract(data)
     print('-------------------------------------')
     print(f'{timedelta(seconds=timer() - start)}')
     print('-------------------------------------')
-    # df.show(10, truncate=False)
+    df.show(5, truncate=False)
 
     # df. \
     #     repartition(1). \
