@@ -1,25 +1,13 @@
-import datetime
 from timeit import default_timer as timer
 from datetime import timedelta
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 
-from helpers import ecos
 
-
-def get_opening_player(opening: str) -> str:
-    try:
-        player = ecos[opening]
-    except KeyError:
-        player = 'white'
-    return player
-
-
-def set_elo_range(opening, white_elo, black_elo):
-    opening_player = get_opening_player(opening)
-    elo = white_elo if opening_player == 'white' else black_elo
-    elo = int(elo)
+def set_elo_range(white_elo: int, black_elo: int) -> str:
+    white_elo, black_elo = int(white_elo), int(black_elo)
+    elo = (white_elo + black_elo) / 2
     elo_range = 'n/a'
     if elo < 1200:
         elo_range = '<1200'
@@ -41,7 +29,7 @@ def set_elo_range(opening, white_elo, black_elo):
         elo_range = '2400-2500'
     elif 2500 <= elo <= 2700:
         elo_range = '2500-2700'
-    elif elo >= 2700:
+    elif 2700 <= elo:
         elo_range = '2700+'
 
     return elo_range
@@ -82,13 +70,12 @@ def main():
             )
         views.append(view)
 
-    elo_range = f.udf(set_elo_range)
+    set_elo_range_udf = f.udf(set_elo_range)
     df = views[0].join(views[1], ['game_id']).join(views[2], ['game_id'])
     df = df.\
         withColumn(
             'elo_range',
-            elo_range(
-                f.col('opening'),
+            set_elo_range_udf(
                 f.col('white_elo'),
                 f.col('black_elo'),
             )
