@@ -6,7 +6,7 @@ from operator import add
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 from pyspark.ml.feature import Bucketizer
-from pyspark.sql.types import IntegerType, StringType, StructField
+from pyspark.sql.types import IntegerType, StringType
 
 SPLITS = [
     0,
@@ -70,7 +70,7 @@ def extract(data):
                     f'\\[{field["name"]} "(.*?)"]',
                     1
                 ).cast(
-                    field['data_type']()
+                    field['data_type'](),
                 ),
             ).\
             withColumn(
