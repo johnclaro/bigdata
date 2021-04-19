@@ -140,16 +140,17 @@ def main(dataset: str):
     df = extract(data)
 
     extract_timer = timer()
-    print(f'Extracting took {timedelta(seconds=timer() - start)}')
+    print(f'Extracting {dataset} took {timedelta(seconds=timer() - start)}')
     # df.show(10, truncate=False)
     df.repartition(4).write.mode('overwrite').parquet(f'files/{dataset}')
-    print(f'Saving / showing took {timedelta(seconds=timer() - extract_timer)}')
+    print(f'End of {dataset} took {timedelta(seconds=timer() - extract_timer)}')
 
     spark.stop()
 
 
 if __name__ == '__main__':
     filepaths = (
+        'datasets/lichess_db_standard_rated_2017-01.pgn',
         '/Volumes/USB/lichess_db_standard_rated_2017-02.pgn',
         '/Volumes/USB/lichess_db_standard_rated_2017-03.pgn',
         '/Volumes/USB/lichess_db_standard_rated_2017-04.pgn',
