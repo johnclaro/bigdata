@@ -133,25 +133,29 @@ def extract(data):
     return df
 
 
-def main():
+def main(dataset: str):
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text('datasets/43gb.pgn')
+    data = spark.read.text(f'datasets/{dataset}.pgn')
     df = extract(data)
 
-    print('-------------------------------------')
     extract_timer = timer()
-    print(f'Extracting took {timedelta(seconds=extract_timer - start)}')
-    print('-------------------------------------')
-
+    print(f'Extracting took {timedelta(seconds=timer() - start)}')
     # df.show(10, truncate=False)
-    df.repartition(4).write.mode('overwrite').parquet('datasets/openings')
-    print('-------------------------------------')
+    df.repartition(4).write.mode('overwrite').parquet(f'files/{dataset}')
     print(f'Saving / showing took {timedelta(seconds=timer() - extract_timer)}')
-    print('-------------------------------------')
 
     spark.stop()
 
 
 if __name__ == '__main__':
-    main()
+    filepaths = (
+        '/Volumes/USB/lichess_db_standard_rated_2017-02',
+        '/Volumes/USB/lichess_db_standard_rated_2017-03',
+        '/Volumes/USB/lichess_db_standard_rated_2017-04',
+        '/Volumes/USB/lichess_db_standard_rated_2017-05',
+        '/Volumes/USB/lichess_db_standard_rated_2017-06',
+        '/Volumes/USB/lichess_db_standard_rated_2017-07',
+    )
+    for filepath in filepaths:
+        main(filepath)
