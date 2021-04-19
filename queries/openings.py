@@ -1,3 +1,5 @@
+import os
+from shutil import copyfile
 from timeit import default_timer as timer
 from datetime import timedelta
 from functools import reduce
@@ -150,13 +152,23 @@ def main(dataset: str):
 
 if __name__ == '__main__':
     filepaths = (
-        'datasets/lichess_db_standard_rated_2017-01.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-02.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-03.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-04.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-05.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-06.pgn',
-        '/Volumes/USB/lichess_db_standard_rated_2017-07.pgn',
+        # 'datasets/lichess_db_standard_rated_2017-01.pgn',
+        # 'datasets/lichess_db_standard_rated_2017-02.pgn',
+        # '/Volumes/USB/lichess_db_standard_rated_2017-03.pgn',
+        # '/Volumes/USB/lichess_db_standard_rated_2017-04.pgn',
+        # '/Volumes/USB/lichess_db_standard_rated_2017-05.pgn',
+        # '/Volumes/USB/lichess_db_standard_rated_2017-06.pgn',
+        # '/Volumes/USB/lichess_db_standard_rated_2017-07.pgn',
     )
     for filepath in filepaths:
-        main(filepath)
+        new_filepath = ''
+        if 'Volumes' in filepath:
+            filename = filepath.split('/')[-1]
+            new_filepath = f'datasets/{filename}'
+            copyfile(filepath, new_filepath)
+
+        if new_filepath:
+            main(new_filepath)
+            os.remove(new_filepath)
+        else:
+            main(filepath)
