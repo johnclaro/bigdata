@@ -136,7 +136,7 @@ def extract(data):
 def main(dataset: str):
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text(f'datasets/{dataset}.pgn')
+    data = spark.read.text(dataset)
     df = extract(data)
 
     extract_timer = timer()
@@ -150,12 +150,12 @@ def main(dataset: str):
 
 if __name__ == '__main__':
     filepaths = (
-        '/Volumes/USB/lichess_db_standard_rated_2017-02',
-        '/Volumes/USB/lichess_db_standard_rated_2017-03',
-        '/Volumes/USB/lichess_db_standard_rated_2017-04',
-        '/Volumes/USB/lichess_db_standard_rated_2017-05',
-        '/Volumes/USB/lichess_db_standard_rated_2017-06',
-        '/Volumes/USB/lichess_db_standard_rated_2017-07',
+        '/Volumes/USB/lichess_db_standard_rated_2017-02.pgn',
+        '/Volumes/USB/lichess_db_standard_rated_2017-03.pgn',
+        '/Volumes/USB/lichess_db_standard_rated_2017-04.pgn',
+        '/Volumes/USB/lichess_db_standard_rated_2017-05.pgn',
+        '/Volumes/USB/lichess_db_standard_rated_2017-06.pgn',
+        '/Volumes/USB/lichess_db_standard_rated_2017-07.pgn',
     )
     for filepath in filepaths:
         main(filepath)
