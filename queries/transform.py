@@ -5,23 +5,23 @@ from pyspark.sql import SparkSession
 
 
 schema = {
-    'Event': '',
-    'Site': '',
-    'White': '',
-    'Black': '',
-    'Result': '',
-    'UTCDate': '',
-    'UTCTime': '',
-    'WhiteElo': 0,
-    'BlackElo': 0,
-    'WhiteRatingDiff': '',
-    'BlackRatingDiff': '',
-    'WhiteTitle': '',
-    'BlackTitle': '',
-    'ECO': '',
+    # 'Event': '',
+    # 'Site': '',
+    # 'White': '',
+    # 'Black': '',
+    # 'Result': '',
+    # 'UTCDate': '',
+    # 'UTCTime': '',
+    # 'WhiteElo': 0,
+    # 'BlackElo': 0,
+    # 'WhiteRatingDiff': '',
+    # 'BlackRatingDiff': '',
+    # 'WhiteTitle': '',
+    # 'BlackTitle': '',
+    # 'ECO': '',
     'Opening': '',
-    'TimeControl': '',
-    'Termination': '',
+    # 'TimeControl': '',
+    # 'Termination': '',
     'Notations': '',
 }
 
@@ -34,17 +34,18 @@ def reformat(df):
         if '"' in value:
             text = value.split('"')
             column = text[0][1:].replace(' ', '')
-            record = text[1]
-            if column in ('WhiteElo', 'BlackElo'):
-                try:
-                    record = int(record)
-                except ValueError:
-                    pass
-            elif column == 'Event':
-                record = record.split(' ')[1]
-            elif column == 'Site':
-                record = record.split('/')[-1]
-            columns[column] = record
+            if column in schema.keys():
+                record = text[1]
+                if column in ('WhiteElo', 'BlackElo'):
+                    try:
+                        record = int(record)
+                    except ValueError:
+                        pass
+                elif column == 'Event':
+                    record = record.split(' ')[1]
+                elif column == 'Site':
+                    record = record.split('/')[-1]
+                columns[column] = record
         if '1. ' in value:
             columns['Notations'] = value
             new_df.append(list(columns.values()))
@@ -62,7 +63,7 @@ def transform(data):
 
 
 def main():
-    filename = '93mb.pgn'
+    filename = '1gb.pgn'
     start = timer()
     spark = SparkSession.builder.appName('openings').getOrCreate()
     data = spark.read.text(f'datasets/{filename}')
@@ -71,7 +72,7 @@ def main():
     extract_timer = timer()
     print(f'Extracting {filename}: {timedelta(seconds=timer() - start)}')
     # df.show(20, truncate=False)
-    df.coalesce(4).write.mode('overwrite').parquet('files/transform')
+    df.coalesce(4).write.mode('overwrite').parquet(f'files/transform/{filename}')
     print(f'End {filename}: {timedelta(seconds=timer() - extract_timer)}')
 
     spark.stop()
