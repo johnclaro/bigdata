@@ -8,7 +8,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 from pyspark.ml.feature import Bucketizer
 
-from helpers import transform
+from helpers import transform, show_or_save
 
 SPLITS = [
     0,
@@ -41,6 +41,7 @@ LABELS = (
 
 
 def extract(df: DataFrame):
+    start = timer()
     df = df.\
         filter(
             (f.col('BlackElo').isNotNull()) &
@@ -89,23 +90,17 @@ def extract(df: DataFrame):
         ). \
         limit(10)
 
+    print(f'Extracting: {timedelta(seconds=timer() - start)}')
     return df
 
 
 def main():
-    filename = '1gb.pgn'
-    start = timer()
+    filename = '93mb.pgn'
     spark = SparkSession.builder.appName('openings').getOrCreate()
     data = spark.read.text(f'datasets/{filename}')
     df = transform(data)
     df = extract(df)
-
-    extract_timer = timer()
-    print(f'Extracting {filename}: {timedelta(seconds=timer() - start)}')
-    df.show(10, truncate=False)
-    # df.coalesce(8).write.mode('overwrite').parquet(f'files/transform/{filename}')
-    print(f'End {filename}: {timedelta(seconds=timer() - extract_timer)}')
-
+    show_or_save(df, filename)
     spark.stop()
 
 

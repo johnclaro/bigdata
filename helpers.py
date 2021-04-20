@@ -1,3 +1,5 @@
+from timeit import default_timer as timer
+from datetime import timedelta
 from collections import deque
 
 from pyspark.sql.dataframe import DataFrame
@@ -53,9 +55,26 @@ def reformat(partition):
 
 
 def transform(data: DataFrame):
+    start = timer()
     df = data.\
         rdd.\
         mapPartitions(reformat).\
         toDF(list(schema.keys()))
+    print(f'Transform: {timedelta(seconds=timer() - start)}')
 
     return df
+
+
+def show_or_save(df, filename):
+    flags = (
+        'Show',
+        # 'Saving',
+    )
+    flag = flags[0]
+    start = timer()
+    if flag == 'Show':
+        df.show(10, truncate=False)
+    else:
+        path = f'files/transform/{filename}'
+        df.coalesce(8).write.mode('overwrite').parquet(path)
+    print(f'{flag}: {timedelta(seconds=timer() - start)}')
