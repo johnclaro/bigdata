@@ -95,12 +95,12 @@ def extract(df: DataFrame):
 
 
 def main():
-    filename = 'lichess_db_standard_rated_2018-03.pgn'
-    spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text(f'datasets/{filename}')
+    query = 'openings'
+    spark = SparkSession.builder.appName(query).getOrCreate()
+    data = spark.read.text('datasets/9gb.pgn')
     df = transform(data)
     df = extract(df)
-    show_or_save(df, 'openings', 'save')
+    show_or_save(df, query, 'save')
     spark.stop()
 
 
