@@ -95,12 +95,12 @@ def extract(df: DataFrame):
 
 
 def main():
-    filename = '1gb.pgn'
+    filename = '93mb.pgn'
     spark = SparkSession.builder.appName('openings').getOrCreate()
     data = spark.read.text(f'datasets/{filename}')
     df = transform(data)
     df = extract(df)
-    show_or_save(df, filename)
+    show_or_save(df, filename, 'openings')
     spark.stop()
 
 

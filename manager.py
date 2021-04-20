@@ -4,8 +4,8 @@ import pandas as pd
 
 
 def main():
-    schema = 'transform/1gb.pgn'
-    folder_path = f'files/{schema}'
+    query = 'openings'
+    folder_path = f'savings/{query}/93mb.pgn'
 
     dfs = []
     for file in os.listdir(folder_path):
@@ -13,11 +13,8 @@ def main():
             df = pd.read_parquet(f'{folder_path}/{file}')
             dfs.append(df)
 
-    csv_file = f'files/{schema}.csv'
+    csv_file = f'files/{query}.csv'
     df = pd.concat(dfs)
-
-    if schema == 'openings':
-        df = df.sort_values(by='total', ascending=False)
 
     df.to_csv(csv_file, index=False)
     print(f'Saved {csv_file}')

@@ -65,7 +65,7 @@ def transform(data: DataFrame):
     return df
 
 
-def show_or_save(df, filename):
+def show_or_save(df, filename, query):
     flags = (
         # 'Show',
         'Saving',
@@ -75,6 +75,6 @@ def show_or_save(df, filename):
     if flag == 'Show':
         df.show(10, truncate=False)
     else:
-        path = f'savings/{filename}'
+        path = f'savings/{query}/{filename}'
         df.coalesce(8).write.mode('overwrite').parquet(path)
     print(f'{flag}: {timedelta(seconds=timer() - start)}')
