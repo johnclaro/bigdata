@@ -2,66 +2,55 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 
 
-schema = StructType([
-    StructField('event', StringType(), True),
-    StructField('site', StringType(), True),
-    StructField('white', StringType(), True),
-    StructField('black', StringType(), True),
-    StructField('result', StringType(), True),
-    StructField('utc_date', StringType(), True),
-    StructField('utc_time', StringType(), True),
-    StructField('white_elo', IntegerType(), True),
-    StructField('black_elo', IntegerType(), True),
-    StructField('black_rating_diff', StringType(), True),
-    StructField('white_rating_diff', StringType(), True),
-    StructField('eco', StringType(), True),
-    StructField('opening', StringType(), True),
-    StructField('time_control', StringType(), True),
-    StructField('termination', StringType(), True),
-])
+default_columns = {
+    'Event': '',
+    'Site': '',
+    'White': '',
+    'Black': '',
+    'Result': '',
+    'UTCDate': '',
+    'UTCTime': '',
+    'WhiteElo': '',
+    'BlackElo': '',
+    'WhiteRatingDiff': '',
+    'BlackRatingDiff': '',
+    'WhiteTitle': '',
+    'BlackTitle': '',
+    'ECO': '',
+    'Opening': '',
+    'TimeControl': '',
+    'Termination': '',
+    'Notations': '',
+}
 
 
 def reformat(df):
     new_df = []
-    columns = []
+    columns = default_columns.copy()
     for row in df:
         value = row.value
-        if '"' in value and '[BlackTitle ' not in value and '[WhiteTitle ' not in value:
-            text = value.split('"')[1]
-            columns.append(text)
-        elif '1.' in value:
-            columns.append(value)
-            new_df.append(columns)
-            columns = []
+        if '"' in value:
+            text = value.split('"')
+            key = text[0][1:].replace(' ', '')
+            columns[key] = text[1]
+        if '1. ' in value:
+            columns['Notations'] = value
+            dvalues = list(columns.values())
+            if len(dvalues) != 18:
+                import json
+                print(json.dumps(columns, indent=4))
+            new_df.append(dvalues)
+            columns = default_columns.copy()
     return iter(new_df)
 
 
-def transform(df):
-    columns = [
-        'event',
-        'site',
-        'white',
-        'black',
-        'result',
-        'utc_date',
-        'utc_time',
-        'white_elo',
-        'black_elo',
-        'white_rating_diff',
-        'black_rating_diff',
-        'eco',
-        'opening',
-        'time_control',
-        'termination',
-        'notation'
-    ]
-    df = df.\
+def transform(data):
+    df = data.\
         rdd.\
         mapPartitions(reformat).\
-        toDF(columns)
+        toDF(list(default_columns.keys()))
 
     return df
 
@@ -76,7 +65,7 @@ def main():
     extract_timer = timer()
     print(f'Extracting {filename}: {timedelta(seconds=timer() - start)}')
     # df.show(20, truncate=False)
-    df.coalesce(1).write.mode('overwrite').csv('files/transform')
+    df.coalesce(4).write.mode('overwrite').csv('files/transform')
     print(f'End {filename}: {timedelta(seconds=timer() - extract_timer)}')
 
     spark.stop()
