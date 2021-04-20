@@ -67,14 +67,14 @@ def transform(data: DataFrame):
 
 def show_or_save(df, filename):
     flags = (
-        'Show',
-        # 'Saving',
+        # 'Show',
+        'Saving',
     )
     flag = flags[0]
     start = timer()
     if flag == 'Show':
         df.show(10, truncate=False)
     else:
-        path = f'files/transform/{filename}'
+        path = f'savings/{filename}'
         df.coalesce(8).write.mode('overwrite').parquet(path)
     print(f'{flag}: {timedelta(seconds=timer() - start)}')

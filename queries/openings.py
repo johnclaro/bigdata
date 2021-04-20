@@ -95,7 +95,7 @@ def extract(df: DataFrame):
 
 
 def main():
-    filename = '93mb.pgn'
+    filename = '1gb.pgn'
     spark = SparkSession.builder.appName('openings').getOrCreate()
     data = spark.read.text(f'datasets/{filename}')
     df = transform(data)
