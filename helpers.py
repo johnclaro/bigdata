@@ -1,5 +1,7 @@
 from collections import deque
 
+from pyspark.sql.dataframe import DataFrame
+
 
 schema = {
     'Event': '',
@@ -23,10 +25,10 @@ schema = {
 }
 
 
-def reformat(df):
+def reformat(partition):
     new_df = deque()
     columns = schema.copy()
-    for row in df:
+    for row in partition:
         value = row.value
         if '"' in value:
             text = value.split('"')
@@ -50,7 +52,7 @@ def reformat(df):
     return iter(new_df)
 
 
-def transform(data):
+def transform(data: DataFrame):
     df = data.\
         rdd.\
         mapPartitions(reformat).\
