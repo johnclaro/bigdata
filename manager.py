@@ -4,8 +4,8 @@ import pandas as pd
 
 
 def main():
-    schema = 'wins'
-    folder_path = f'datasets/{schema}'
+    schema = 'transform/1gb.pgn'
+    folder_path = f'files/{schema}'
 
     dfs = []
     for file in os.listdir(folder_path):

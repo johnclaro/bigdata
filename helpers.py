@@ -1,33 +1,30 @@
-from timeit import default_timer as timer
-from datetime import timedelta
-
-from pyspark.sql import SparkSession
+from collections import deque
 
 
 schema = {
-    # 'Event': '',
-    # 'Site': '',
-    # 'White': '',
-    # 'Black': '',
-    # 'Result': '',
-    # 'UTCDate': '',
-    # 'UTCTime': '',
-    # 'WhiteElo': 0,
-    # 'BlackElo': 0,
-    # 'WhiteRatingDiff': '',
-    # 'BlackRatingDiff': '',
-    # 'WhiteTitle': '',
-    # 'BlackTitle': '',
-    # 'ECO': '',
+    'Event': '',
+    'Site': '',
+    'White': '',
+    'Black': '',
+    'Result': '',
+    'UTCDate': '',
+    'UTCTime': '',
+    'WhiteElo': 0,
+    'BlackElo': 0,
+    'WhiteRatingDiff': '',
+    'BlackRatingDiff': '',
+    'WhiteTitle': '',
+    'BlackTitle': '',
+    'ECO': '',
     'Opening': '',
-    # 'TimeControl': '',
-    # 'Termination': '',
+    'TimeControl': '',
+    'Termination': '',
     'Notations': '',
 }
 
 
 def reformat(df):
-    new_df = []
+    new_df = deque()
     columns = schema.copy()
     for row in df:
         value = row.value
@@ -60,23 +57,3 @@ def transform(data):
         toDF(list(schema.keys()))
 
     return df
-
-
-def main():
-    filename = '1gb.pgn'
-    start = timer()
-    spark = SparkSession.builder.appName('openings').getOrCreate()
-    data = spark.read.text(f'datasets/{filename}')
-    df = transform(data)
-
-    extract_timer = timer()
-    print(f'Extracting {filename}: {timedelta(seconds=timer() - start)}')
-    # df.show(20, truncate=False)
-    df.coalesce(4).write.mode('overwrite').parquet(f'files/transform/{filename}')
-    print(f'End {filename}: {timedelta(seconds=timer() - extract_timer)}')
-
-    spark.stop()
-
-
-if __name__ == '__main__':
-    main()
