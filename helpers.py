@@ -65,16 +65,11 @@ def transform(data: DataFrame):
     return df
 
 
-def show_or_save(df, filename, query):
-    flags = (
-        # 'Show',
-        'Saving',
-    )
-    flag = flags[0]
+def show_or_save(df, filename, query, mode):
     start = timer()
-    if flag == 'Show':
+    if mode.title() == 'Show':
         df.show(10, truncate=False)
     else:
         path = f'savings/{query}/{filename}'
         df.coalesce(8).write.mode('overwrite').parquet(path)
-    print(f'{flag}: {timedelta(seconds=timer() - start)}')
+    print(f'{mode}: {timedelta(seconds=timer() - start)}')
