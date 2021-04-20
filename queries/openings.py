@@ -100,7 +100,7 @@ def main():
     data = spark.read.text(f'datasets/{filename}')
     df = transform(data)
     df = extract(df)
-    show_or_save(df, filename, 'openings', 'save')
+    show_or_save(df, 'openings', 'save')
     spark.stop()
 
 

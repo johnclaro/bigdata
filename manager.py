@@ -5,7 +5,7 @@ import pandas as pd
 
 def main():
     query = 'openings'
-    folder_path = f'savings/{query}/93mb.pgn'
+    folder_path = f'savings/{query}'
 
     dfs = []
     for file in os.listdir(folder_path):
