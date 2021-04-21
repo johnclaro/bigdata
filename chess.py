@@ -41,10 +41,17 @@ def main():
     filename = args.filename
     filepath = f'datasets/{filename}.pgn'
 
+    num_partitions = 10
+    if 'mb' in filename:
+        num_partitions = 1001
+    elif 'gb' in filename:
+        num_partitions = 2001
+
     print('-------------------------------------------------------------------')
     print('{:<30} {} ({}, {})'.format('function', 'time', app, filepath))
     print('-------------------------------------------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
+    spark.conf.set('spark.sql.shuffle.partitions', num_partitions)
     data = spark.read.text(filepath)
     df = transform(data)
 
