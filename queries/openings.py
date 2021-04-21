@@ -8,35 +8,21 @@ from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 from pyspark.ml.feature import Bucketizer
 
-from helpers import transform, show_or_save
+from helpers import transform, save
 
 SPLITS = [
     0,
-    1200,
-    1400,
-    1600,
-    1800,
+    1500,
     2000,
-    2200,
-    2300,
-    2400,
     2500,
-    2700,
     9999,
 ]
 
 LABELS = (
-    '0-1200',
-    '1200-1400',
-    '1400-1600',
-    '1600-1800',
-    '1800-2000',
-    '2000-2200',
-    '2200-2300',
-    '2300-2400',
-    '2400-2500',
-    '2500-2700',
-    '2700+',
+    'Below1500',
+    '1500-2000',
+    '2000-2500',
+    'Above2500',
 )
 
 
@@ -97,10 +83,11 @@ def extract(df: DataFrame):
 def main():
     query = 'openings'
     spark = SparkSession.builder.appName(query).getOrCreate()
-    data = spark.read.text('datasets/9gb.pgn')
+    data = spark.read.text('datasets/93mb.pgn')
     df = transform(data)
     df = extract(df)
-    show_or_save(df, query, 'save')
+    # df.show(truncate=False)
+    save(df, query)
     spark.stop()
 
 

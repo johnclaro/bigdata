@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.types import IntegerType
 
-from helpers import transform, show_or_save
+from helpers import transform, save
 
 
 def extract(df: DataFrame):
@@ -41,7 +41,8 @@ def main():
     data = spark.read.text('datasets/12gb.pgn')
     df = transform(data)
     df = extract(df)
-    show_or_save(df, query, 'save')
+    df.show(truncate=False)
+    # save(df, query)
     spark.stop()
 
 
