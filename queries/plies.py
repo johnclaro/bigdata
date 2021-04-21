@@ -4,6 +4,7 @@ from datetime import timedelta
 from pyspark.sql import functions as f
 from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.types import IntegerType
 
 from helpers import transform, show_or_save
 
@@ -14,16 +15,20 @@ def extract(df: DataFrame):
         filter(
             (f.col('Result') != '')
         ).\
-        groupBy('Plies', 'Result').\
-        pivot('Result').\
-        count().\
-        groupBy('Plies').\
+        withColumn(
+            'Plies',
+            f.size('Notations')
+        ). \
+        groupBy('Plies', 'Result'). \
+        pivot('Result'). \
+        count(). \
+        groupBy('Plies'). \
         agg(
             f.sum('0-1').alias('BlackWins'),
             f.sum('1-0').alias('WhiteWins'),
             f.sum('1/2-1/2').alias('Draw'),
-        ).\
-        na.\
+        ). \
+        na. \
         fill(0)
 
     print(f'Extracting: {timedelta(seconds=timer() - start)}')
