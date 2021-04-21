@@ -23,8 +23,7 @@ schema = {
     'Opening': '',
     'TimeControl': '',
     'Termination': '',
-    'Notations': '',
-    'Plies': 0,
+    'Notations': [],
 }
 
 
@@ -59,15 +58,12 @@ def reformat(partition):
                     record = record.split('/')[-1]
                 columns[column] = record
         if '1. ' in value:
-            columns['Notations'] = value
-
-            plies = 0
-            for ply in value.split(' '):
-                if is_ply(ply):
-                    plies += 1
-
-            columns['Plies'] = plies
-
+            notations = [
+                ply
+                for ply in value.split(' ')
+                if is_ply(ply)
+            ]
+            columns['Notations'] = notations
             new_df.append(list(columns.values()))
             columns = schema.copy()
     return iter(new_df)
