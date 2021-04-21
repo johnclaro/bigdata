@@ -34,32 +34,17 @@ def main():
         dest='filename',
         help='Name of file in datasets folder',
     )
-    parser.add_argument(
-        '-n',
-        '--num_partitions',
-        required=True,
-        dest='num_partitions',
-        help='Number of partitions for spark.sql.shuffle.partitions',
-    )
     parser.set_defaults(save=False)
     args = parser.parse_args()
     app = args.app[0]
     save = args.save
-    num_partitions = args.num_partitions
     filename = args.filename
     filepath = f'datasets/{filename}.pgn'
 
     print('-------------------------------------------------------------------')
-    print('{:<30} {} ({}, {}, {})'.format(
-        'function',
-        'time',
-        app,
-        num_partitions,
-        filepath,
-    ))
+    print('{:<30} {} ({}, {})'.format('function', 'time', app, filepath))
     print('-------------------------------------------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
-    spark.conf.set('spark.sql.shuffle.partitions', num_partitions)
     data = spark.read.text(filepath)
     df = transform(data)
 
