@@ -38,7 +38,7 @@ def extract(df: DataFrame):
 def main():
     query = 'plies'
     spark = SparkSession.builder.appName(query).getOrCreate()
-    data = spark.read.text('datasets/93mb.pgn')
+    data = spark.read.text('datasets/12gb.pgn')
     df = transform(data)
     df = extract(df)
     show_or_save(df, query, 'save')
