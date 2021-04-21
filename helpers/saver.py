@@ -23,6 +23,5 @@ def show_or_save(df, app, save):
             df = df.sort_values(by=['Plies'])
 
         df.to_csv(csv_file, index=False)
-        print(f'Saved {csv_file}')
     else:
         df.show(truncate=False)

@@ -14,11 +14,23 @@ def main():
         choices=('openings', 'plies'),
         help='Name of app'
     )
+    parser.add_argument(
+        '--save',
+        dest='save',
+        action='store_true'
+    )
+    parser.set_defaults(save=False)
     args = parser.parse_args()
     app = args.app[0]
+    save = args.save
 
+    data_file = 'datasets/test.pgn'
+
+    print('============================')
+    print(f'{app.title()} - {data_file}')
+    print('============================')
     spark = SparkSession.builder.appName(app).getOrCreate()
-    data = spark.read.text('datasets/test.pgn')
+    data = spark.read.text(data_file)
     df = transform(data)
 
     if app == 'openings':
@@ -26,7 +38,7 @@ def main():
     elif app == 'plies':
         df = plies.extract(df)
 
-    show_or_save(df, app, save=False)
+    show_or_save(df, app, save=save)
     spark.stop()
 
 
