@@ -41,9 +41,9 @@ def main():
     filename = args.filename
     filepath = f'datasets/{filename}.pgn'
 
-    print('-------------------------------')
+    print('-------------------------------------------------------------------')
     print(f'{app} \t {filepath}')
-    print('-------------------------------')
+    print('-------------------------------------------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
     data = spark.read.text(filepath)
     df = transform(data)
