@@ -9,9 +9,9 @@ from helpers.saver import show_or_save
 
 def main():
     choices = [
-        folder.replace('.py', '')
-        for folder in os.listdir('apps')
-        if '__' not in folder
+        filename.replace('.py', '')
+        for filename in os.listdir('apps')
+        if '__' not in filename
     ]
     parser = argparse.ArgumentParser()
     parser.add_argument(
