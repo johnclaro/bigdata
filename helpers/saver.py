@@ -16,7 +16,7 @@ def show_or_save(df, app, save):
                 df = pd.read_parquet(f'{partitions}/{file}')
                 dfs.append(df)
 
-        csv_file = f'output/{app}.csv'
+        csv_file = f'csvs/{app}.csv'
         df = pd.concat(dfs)
 
         if app == 'plies':
