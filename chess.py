@@ -42,7 +42,7 @@ def main():
     filepath = f'datasets/{filename}.pgn'
 
     print('-------------------------------------------------------------------')
-    print(f'{app} \t {filepath}')
+    print(f'function \t time \t\t {app} \t {filepath}')
     print('-------------------------------------------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
     data = spark.read.text(filepath)
