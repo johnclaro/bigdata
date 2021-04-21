@@ -18,25 +18,34 @@ def main():
         'app',
         nargs=1,
         choices=choices,
-        help='Name of app'
+        help='Name of app',
     )
     parser.add_argument(
+        '-s',
         '--save',
         dest='save',
-        action='store_true'
+        action='store_true',
+        help='Saves output to CSV otherwise just prints it',
+    )
+    parser.add_argument(
+        '-f',
+        '--file',
+        required=True,
+        dest='filename',
+        help='Name of file in datasets folder',
     )
     parser.set_defaults(save=False)
     args = parser.parse_args()
     app = args.app[0]
     save = args.save
+    filename = args.filename
+    filepath = f'datasets/{filename}.pgn'
 
-    data_file = 'datasets/test.pgn'
-
-    print('===============================')
-    print(f'{app.title()} - {data_file}')
-    print('===============================')
+    print('-------------------------------')
+    print(f'{app.title()} - {filepath}')
+    print('-------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
-    data = spark.read.text(data_file)
+    data = spark.read.text(filepath)
     df = transform(data)
 
     if app == 'openings':
