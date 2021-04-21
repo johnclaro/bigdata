@@ -7,15 +7,14 @@ from datetime import timedelta
 
 def save(df, app):
     start = timer()
-    df.coalesce(8).write.mode('overwrite').parquet(f'savings/{app}')
+    partitions = f'partitions/{app}'
+    df.coalesce(8).write.mode('overwrite').parquet(partitions)
     print(f'Saving: {timedelta(seconds=timer() - start)}')
 
-    folder_path = f'savings/{app}'
-
     dfs = []
-    for file in os.listdir(folder_path):
+    for file in os.listdir(partitions):
         if file.endswith('parquet'):
-            df = pd.read_parquet(f'{folder_path}/{file}')
+            df = pd.read_parquet(f'{partitions}/{file}')
             dfs.append(df)
 
     csv_file = f'files/{app}.csv'
