@@ -1,16 +1,8 @@
-from timeit import default_timer as timer
-from datetime import timedelta
-
 from pyspark.sql import functions as f
-from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
-
-from helpers.transformer import transform
-from helpers.saver import save
 
 
 def extract(df: DataFrame):
-    start = timer()
     df = df.\
         filter(
             (f.col('Result') != '')
@@ -31,20 +23,4 @@ def extract(df: DataFrame):
         na. \
         fill(0)
 
-    print(f'Extracting: {timedelta(seconds=timer() - start)}')
     return df
-
-
-def main():
-    app = 'plies'
-    spark = SparkSession.builder.appName(app).getOrCreate()
-    data = spark.read.text('datasets/12gb.pgn')
-    df = transform(data)
-    df = extract(df)
-    df.show(truncate=False)
-    # save(df, app)
-    spark.stop()
-
-
-if __name__ == '__main__':
-    main()

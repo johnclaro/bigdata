@@ -17,7 +17,7 @@ def save(df, app):
             df = pd.read_parquet(f'{partitions}/{file}')
             dfs.append(df)
 
-    csv_file = f'files/{app}.csv'
+    csv_file = f'output/{app}.csv'
     df = pd.concat(dfs)
 
     if app == 'plies':
