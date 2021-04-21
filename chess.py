@@ -50,7 +50,7 @@ def main():
     filepath = f'datasets/{filename}.pgn'
 
     print('-------------------------------------------------------------------')
-    print('{:<30} {} ({}, {})'.format(
+    print('{:<30} {} ({}, {}, {})'.format(
         'function',
         'time',
         app,
