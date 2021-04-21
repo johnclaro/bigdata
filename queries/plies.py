@@ -11,13 +11,20 @@ from helpers import transform, show_or_save
 def extract(df: DataFrame):
     start = timer()
     df = df.\
-        withColumn(
-            'Plies',
-            f.split(
-                'moves',
-                ' '
-            )[0]
-        )
+        filter(
+            (f.col('Result') != '')
+        ).\
+        groupBy('Plies', 'Result').\
+        pivot('Result').\
+        count().withColumnRenamed('count', 'NumberOfGames').\
+        na.\
+        fill(0).\
+        orderBy(
+            f.desc(
+                f.col('Plies')
+            )
+        ).\
+        select('Plies', '0-1', '1-0', '1/2-1/2')
 
     print(f'Extracting: {timedelta(seconds=timer() - start)}')
     return df
@@ -26,7 +33,7 @@ def extract(df: DataFrame):
 def main():
     query = 'plies'
     spark = SparkSession.builder.appName(query).getOrCreate()
-    data = spark.read.text('datasets/test.pgn')
+    data = spark.read.text('datasets/93mb.pgn')
     df = transform(data)
     df = extract(df)
     show_or_save(df, query, 'save')

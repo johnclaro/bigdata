@@ -24,7 +24,18 @@ schema = {
     'TimeControl': '',
     'Termination': '',
     'Notations': '',
+    'Plies': 0,
 }
+
+
+def is_ply(value):
+    return (
+        '.' not in value and
+        '-' not in value and
+        '{' not in value and
+        '}' not in value and
+        '%' not in value
+    )
 
 
 def reformat(partition):
@@ -49,6 +60,14 @@ def reformat(partition):
                 columns[column] = record
         if '1. ' in value:
             columns['Notations'] = value
+
+            plies = 0
+            for ply in value.split(' '):
+                if is_ply(ply):
+                    plies += 1
+
+            columns['Plies'] = plies
+
             new_df.append(list(columns.values()))
             columns = schema.copy()
     return iter(new_df)
@@ -68,7 +87,7 @@ def transform(data: DataFrame):
 def show_or_save(df, query, mode):
     start = timer()
     if mode.title() == 'Show':
-        df.show(10, truncate=False)
+        df.show(df.count(), truncate=False)
     else:
         df.coalesce(8).write.mode('overwrite').parquet(f'savings/{query}')
     print(f'{mode}: {timedelta(seconds=timer() - start)}')
