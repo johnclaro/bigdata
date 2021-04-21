@@ -4,9 +4,10 @@ Mining chess data using PySpark
 
 ## Getting started
 
-To run a script
+To save extracted data of openings
 ```console
-spark-submit queries/openings.py
+export PYTHONPATH=.
+spark-submit chess.py openings --save
 ```
 
 ## Datasets
