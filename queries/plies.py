@@ -16,15 +16,15 @@ def extract(df: DataFrame):
         ).\
         groupBy('Plies', 'Result').\
         pivot('Result').\
-        count().withColumnRenamed('count', 'NumberOfGames').\
-        na.\
-        fill(0).\
-        orderBy(
-            f.desc(
-                f.col('Plies')
-            )
+        count().\
+        groupBy('Plies').\
+        agg(
+            f.sum('0-1').alias('BlackWins'),
+            f.sum('1-0').alias('WhiteWins'),
+            f.sum('1/2-1/2').alias('Draw'),
         ).\
-        select('Plies', '0-1', '1-0', '1/2-1/2')
+        na.\
+        fill(0)
 
     print(f'Extracting: {timedelta(seconds=timer() - start)}')
     return df

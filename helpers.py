@@ -87,7 +87,7 @@ def transform(data: DataFrame):
 def show_or_save(df, query, mode):
     start = timer()
     if mode.title() == 'Show':
-        df.show(df.count(), truncate=False)
+        df.show(truncate=False)
     else:
         df.coalesce(8).write.mode('overwrite').parquet(f'savings/{query}')
     print(f'{mode}: {timedelta(seconds=timer() - start)}')

@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def main():
-    query = 'openings'
+    query = 'plies'
     folder_path = f'savings/{query}'
 
     dfs = []
@@ -15,6 +15,9 @@ def main():
 
     csv_file = f'files/{query}.csv'
     df = pd.concat(dfs)
+
+    if query == 'plies':
+        df = df.sort_values(by=['Plies'])
 
     df.to_csv(csv_file, index=False)
     print(f'Saved {csv_file}')
