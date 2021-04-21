@@ -42,9 +42,7 @@ def main():
     filepath = f'datasets/{filename}.pgn'
 
     num_partitions = 10
-    if 'mb' in filename:
-        num_partitions = 1001
-    elif 'gb' in filename:
+    if 'gb' in filename and 'mb' in filename:
         num_partitions = 2001
 
     print('-------------------------------------------------------------------')

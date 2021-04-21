@@ -141,7 +141,6 @@ def group_openings(df):
             | Ruy Lopez      | 1         | 0         |
             | Italian's Game | 1         | 1         |
     """
-    df.select('Opening', 'EloRange').show()
     df = df. \
         groupBy('Opening'). \
         pivot('EloRange'). \
