@@ -36,13 +36,13 @@ def extract(df: DataFrame):
 
 
 def main():
-    query = 'plies'
-    spark = SparkSession.builder.appName(query).getOrCreate()
+    app = 'plies'
+    spark = SparkSession.builder.appName(app).getOrCreate()
     data = spark.read.text('datasets/12gb.pgn')
     df = transform(data)
     df = extract(df)
     df.show(truncate=False)
-    # save(df, query)
+    # save(df, app)
     spark.stop()
 
 

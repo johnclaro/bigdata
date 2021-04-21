@@ -83,13 +83,13 @@ def extract(df: DataFrame):
 
 
 def main():
-    query = 'openings'
-    spark = SparkSession.builder.appName(query).getOrCreate()
+    app = 'openings'
+    spark = SparkSession.builder.appName(app).getOrCreate()
     data = spark.read.text('datasets/93mb.pgn')
     df = transform(data)
     df = extract(df)
     # df.show(truncate=False)
-    save(df, query)
+    save(df, app)
     spark.stop()
 
 

@@ -5,12 +5,12 @@ from timeit import default_timer as timer
 from datetime import timedelta
 
 
-def save(df, query):
+def save(df, app):
     start = timer()
-    df.coalesce(8).write.mode('overwrite').parquet(f'savings/{query}')
+    df.coalesce(8).write.mode('overwrite').parquet(f'savings/{app}')
     print(f'Saving: {timedelta(seconds=timer() - start)}')
 
-    folder_path = f'savings/{query}'
+    folder_path = f'savings/{app}'
 
     dfs = []
     for file in os.listdir(folder_path):
@@ -18,10 +18,10 @@ def save(df, query):
             df = pd.read_parquet(f'{folder_path}/{file}')
             dfs.append(df)
 
-    csv_file = f'files/{query}.csv'
+    csv_file = f'files/{app}.csv'
     df = pd.concat(dfs)
 
-    if query == 'plies':
+    if app == 'plies':
         df = df.sort_values(by=['Plies'])
 
     df.to_csv(csv_file, index=False)
