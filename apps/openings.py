@@ -5,6 +5,8 @@ from pyspark.sql import functions as f
 from pyspark.sql.dataframe import DataFrame
 from pyspark.ml.feature import Bucketizer
 
+from helpers.timer import timer
+
 
 SPLITS = [
     0,
@@ -22,6 +24,7 @@ LABELS = (
 )
 
 
+@timer
 def extract(df: DataFrame):
     df = df.\
         filter(

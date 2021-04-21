@@ -1,7 +1,10 @@
 from pyspark.sql import functions as f
 from pyspark.sql.dataframe import DataFrame
 
+from helpers.timer import timer
 
+
+@timer
 def extract(df: DataFrame):
     df = df.\
         filter(

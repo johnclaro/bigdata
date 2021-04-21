@@ -1,9 +1,8 @@
-from timeit import default_timer as timer
-from datetime import timedelta
 from collections import deque
 
-
 from pyspark.sql.dataframe import DataFrame
+
+from helpers.timer import timer
 
 
 schema = {
@@ -70,13 +69,12 @@ def reformat(partition):
     return iter(new_df)
 
 
+@timer
 def transform(data: DataFrame):
-    start = timer()
     df = data.\
         rdd.\
         mapPartitions(reformat).\
         toDF(list(schema.keys()))
-    print(f'Transform: {timedelta(seconds=timer() - start)}')
 
     return df
 
