@@ -1,4 +1,5 @@
 import argparse
+import os
 from pyspark.sql import SparkSession
 
 from apps import openings, plies
@@ -7,11 +8,16 @@ from helpers.saver import show_or_save
 
 
 def main():
+    choices = [
+        folder.replace('.py', '')
+        for folder in os.listdir('apps')
+        if '__' not in folder
+    ]
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'app',
         nargs=1,
-        choices=('openings', 'plies'),
+        choices=choices,
         help='Name of app'
     )
     parser.add_argument(
@@ -26,9 +32,9 @@ def main():
 
     data_file = 'datasets/test.pgn'
 
-    print('============================')
+    print('===============================')
     print(f'{app.title()} - {data_file}')
-    print('============================')
+    print('===============================')
     spark = SparkSession.builder.appName(app).getOrCreate()
     data = spark.read.text(data_file)
     df = transform(data)
