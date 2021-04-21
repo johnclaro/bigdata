@@ -8,7 +8,8 @@ def timer(function):
         start = default_timer()
         output = function(*args, **kwargs)
         end = timedelta(seconds=default_timer() - start)
-        print(f'{function.__name__} \t {end}')
+        name = function.__name__
+        print('{:<40} {}'.format(name, end))
         return output
 
     return wrapper
