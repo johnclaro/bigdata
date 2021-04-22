@@ -50,13 +50,8 @@ def main():
     filepath = f'datasets/{filename}.pgn'
 
     print('-------------------------------------------------------------------')
-    print('{:<30} {} ({}, {}, {})'.format(
-        'function',
-        'time',
-        app,
-        num_partitions,
-        filepath,
-    ))
+    messages = ('function', 'time', app, num_partitions, filepath)
+    print('{:<30} {} ({}, {}, {})'.format(*messages))
     print('-------------------------------------------------------------------')
     spark = SparkSession.builder.appName(app).getOrCreate()
     spark.conf.set('spark.sql.shuffle.partitions', num_partitions)
