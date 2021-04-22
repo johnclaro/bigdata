@@ -17,9 +17,9 @@ def filter_elos(df):
             | 2000     | 2600     |
 
     Returns:
-            | WhiteElo | BlackElo | Elo  |
-            |----------|----------|------|
-            | 32       | 23       | 27.5 |
+            | WhiteElo | BlackElo |
+            | 1200     | 1600     |
+            | 2000     | 2600     |
     """
     df = df.\
         filter(
