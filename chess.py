@@ -1,8 +1,9 @@
 import argparse
 import os
+import importlib
+
 from pyspark.sql import SparkSession
 
-from apps import openings, plies
 from helpers.transformer import transform
 from helpers.saver import show_or_save
 
@@ -58,10 +59,8 @@ def main():
     data = spark.read.text(filepath)
     df = transform(data)
 
-    if app == 'openings':
-        df = openings.extract(df)
-    elif app == 'plies':
-        df = plies.extract(df)
+    app_mod = importlib.import_module(f'apps.{app}')
+    df = app_mod.extract(df)
 
     show_or_save(df, app, save=save)
     spark.stop()
