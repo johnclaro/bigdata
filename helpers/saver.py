@@ -21,6 +21,8 @@ def show_or_save(df, app, save):
 
         if app == 'plies':
             df = df.sort_values(by=['Plies'])
+        elif app == 'moves':
+            df = df.sort_values(by=['Count'], ascending=False)
 
         df.to_csv(csv_file, index=False)
     else:
