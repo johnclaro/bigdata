@@ -5,7 +5,7 @@ from helpers.timer import timer
 
 
 @timer
-def get_plies(df):
+def get_plies(df: DataFrame):
     df = df. \
         withColumn(
             'Plies',
@@ -18,24 +18,36 @@ def get_plies(df):
 
 
 @timer
-def get_king_plies(df):
+def get_king_plies(df: DataFrame):
     df = df.\
         withColumn(
-            'Kings',
-            f.split(
-                f.regexp_replace(
-                    f.col('Plies'),
-                    'Kx',
+            'KingPly',
+            f.regexp_replace(
+                f.split(
+                    f.regexp_replace(
+                        f.col('Plies'),
+                        'Kx',
+                        'K'
+                    ),
                     'K'
-                ),
-                'K'
-            )[1]
+                )[1],
+                r'[^\w\*]',
+                ''
+            )
         )
+    return df
+
+
+@timer
+def group_by_kings(df: DataFrame):
+    df = df.\
+        groupBy('KingPly').\
+        count().withColumnRenamed('count', 'Count')
     return df
 
 
 def extract(df: DataFrame):
     df = get_plies(df)
     df = get_king_plies(df)
-    df = df.select('Kings')
+    df = group_by_kings(df)
     return df
