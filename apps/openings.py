@@ -12,8 +12,9 @@ def filter_elos(df):
     Args:
         df: | WhiteElo | BlackElo |
             |----------|----------|
-            | null     | 24       |
-            | 32       | 23       |
+            | null     | 2700     |
+            | 1200     | 1600     |
+            | 2000     | 2600     |
 
     Returns:
             | WhiteElo | BlackElo | Elo  |
