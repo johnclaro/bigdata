@@ -37,7 +37,7 @@ def main():
     parser.add_argument(
         '-n',
         '--num_partitions',
-        required=True,
+        default=200,
         dest='num_partitions',
         help='Number of partitions for spark.sql.shuffle.partitions',
     )
