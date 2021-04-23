@@ -14,7 +14,7 @@ def remove_symbols(ply: str):
         replace('!', '')
 
 
-def map_turns(partition, piece):
+def map_notations(partition, piece):
     for row in partition:
         pieces = []
         for index in range(0, len(row.Notations), 2):
@@ -48,7 +48,7 @@ def get_piece(df: DataFrame, piece, column):
     df = df. \
         select('Notations').\
         rdd. \
-        mapPartitions(lambda j: map_turns(j, piece)). \
+        mapPartitions(lambda partition: map_notations(partition, piece)). \
         toDF([column])
 
     return df
