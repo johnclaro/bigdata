@@ -16,7 +16,7 @@ def remove_symbols(ply: str):
 
 def map_notations(partition, piece):
     for row in partition:
-        pieces = []
+        locations = []
         for index in range(0, len(row.Notations), 2):
             white = row.Notations[index]
             try:
@@ -47,33 +47,33 @@ def map_notations(partition, piece):
 
             if white.startswith(piece):
                 white = remove_symbols(white)[-2:]
-                pieces.append(white)
+                locations.append(white)
             elif black and black.startswith(piece):
                 black = remove_symbols(black)[-2:]
-                pieces.append(black)
+                locations.append(black)
 
-        yield [pieces]
+        yield [locations]
 
 
 @timer
-def get_piece(df: DataFrame, piece, column):
+def get_piece(df: DataFrame, piece):
     df = df. \
         select('Notations').\
         rdd. \
         mapPartitions(lambda partition: map_notations(partition, piece)). \
-        toDF([column])
+        toDF(['Location'])
 
     return df
 
 
 @timer
-def group_by_piece(df: DataFrame, column):
+def group_by_piece(df: DataFrame):
     df = df.\
         withColumn(
-            column,
-            f.explode(column)
+            'Location',
+            f.explode('Location')
         ).\
-        groupBy(column).\
+        groupBy('Location').\
         count().withColumnRenamed('count', 'Count')
 
     return df
