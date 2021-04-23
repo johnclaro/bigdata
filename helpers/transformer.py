@@ -3,28 +3,6 @@ from pyspark.sql.dataframe import DataFrame
 from helpers.timer import timer
 
 
-default_schema = {
-    'Event': '',
-    'Site': '',
-    'White': '',
-    'Black': '',
-    'Result': '',
-    'UTCDate': '',
-    'UTCTime': '',
-    'WhiteElo': 0,
-    'BlackElo': 0,
-    'WhiteRatingDiff': '',
-    'BlackRatingDiff': '',
-    'WhiteTitle': '',
-    'BlackTitle': '',
-    'ECO': '',
-    'Opening': '',
-    'TimeControl': '',
-    'Termination': '',
-    'Notations': [],
-}
-
-
 def is_ply(ply):
     return (
         '.' not in ply and
@@ -35,14 +13,13 @@ def is_ply(ply):
     )
 
 
-def reformat(partition):
-    schema = default_schema.copy()
+def reformat(partition, schema: dict):
     for row in partition:
         value = row.value
         if '"' in value:
             text = value.split('"')
             column = text[0][1:].replace(' ', '')
-            if column in default_schema.keys():
+            if column in schema.keys():
                 record = text[1]
                 if column in ('WhiteElo', 'BlackElo'):
                     try:
@@ -66,10 +43,31 @@ def reformat(partition):
 
 @timer
 def transform(data: DataFrame):
+    schema = {
+        'Event': '',
+        'Site': '',
+        'White': '',
+        'Black': '',
+        'Result': '',
+        'UTCDate': '',
+        'UTCTime': '',
+        'WhiteElo': 0,
+        'BlackElo': 0,
+        'WhiteRatingDiff': '',
+        'BlackRatingDiff': '',
+        'WhiteTitle': '',
+        'BlackTitle': '',
+        'ECO': '',
+        'Opening': '',
+        'TimeControl': '',
+        'Termination': '',
+        'Notations': [],
+    }
+
     df = data.\
         rdd.\
-        mapPartitions(reformat).\
-        toDF(list(default_schema.keys()))
+        mapPartitions(lambda partition: reformat(partition, schema)).\
+        toDF(list(schema.keys()))
 
     return df
 
