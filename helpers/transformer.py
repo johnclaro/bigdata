@@ -27,12 +27,13 @@ schema = {
 }
 
 
-def is_ply(value):
+def is_ply(ply):
     return (
-        '.' not in value and
-        '{' not in value and
-        '}' not in value and
-        '%' not in value
+        '.' not in ply and
+        '{' not in ply and
+        '}' not in ply and
+        '%' not in ply and
+        ply not in ('1-0', '0-1', '1/2-1/2', '*')
     )
 
 
