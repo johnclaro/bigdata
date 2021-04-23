@@ -4,9 +4,19 @@ from pyspark.sql.dataframe import DataFrame
 from helpers.timer import timer
 
 
-def map_turns(partition, ply):
+def remove_symbols(ply: str):
+    return ply.\
+        replace('+', '').\
+        replace('?', '').\
+        replace('+', '').\
+        replace('#', '').\
+        replace('x', '').\
+        replace('!', '')
+
+
+def map_turns(partition, piece):
     for row in partition:
-        plies = []
+        pieces = []
         for index in range(0, len(row.Notations), 2):
             white = row.Notations[index]
             try:
@@ -23,22 +33,22 @@ def map_turns(partition, ply):
             elif black == 'O-O-O':
                 black = 'Kc8'
 
-            if ply in white:
-                white = white.replace('x', '')
-                plies.append(white[1:3])
-            elif black and ply in black:
-                black = black.replace('x', '')
-                plies.append(black[1:3])
+            if white.startswith(piece):
+                white = remove_symbols(white)[-2:]
+                pieces.append(white)
+            elif black and black.startswith(piece):
+                black = remove_symbols(black)[-2:]
+                pieces.append(black)
 
-        yield [plies]
+        yield [pieces]
 
 
 @timer
-def get_turns(df: DataFrame, half_move, column):
+def get_turns(df: DataFrame, piece, column):
     df = df. \
         select('Notations').\
         rdd. \
-        mapPartitions(lambda j: map_turns(j, half_move)). \
+        mapPartitions(lambda j: map_turns(j, piece)). \
         toDF([column])
 
     return df
