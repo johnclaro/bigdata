@@ -56,7 +56,7 @@ def map_notations(partition, piece):
 
 
 @timer
-def get_piece(df: DataFrame, piece):
+def find_pieces(df: DataFrame, piece):
     df = df. \
         select('Notations').\
         rdd. \
@@ -67,7 +67,7 @@ def get_piece(df: DataFrame, piece):
 
 
 @timer
-def group_by_piece(df: DataFrame):
+def group_by_location(df: DataFrame):
     df = df.\
         withColumn(
             'Location',
