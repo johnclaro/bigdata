@@ -18,7 +18,7 @@ def get_notations_size(df: DataFrame):
 
 
 @timer
-def group_by_result(df: DataFrame):
+def pivot_result(df: DataFrame):
     df = df. \
         groupBy('Plies', 'Result'). \
         pivot('Result'). \
@@ -42,6 +42,6 @@ def group_by_plies(df: DataFrame):
 
 def extract(df: DataFrame):
     df = get_notations_size(df)
-    df = group_by_result(df)
+    df = pivot_result(df)
     df = group_by_plies(df)
     return df
