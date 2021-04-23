@@ -1,6 +1,6 @@
 from pyspark.sql.dataframe import DataFrame
 
-from helpers.heatmap import get_piece, group_by_piece
+from helpers.pieces import get_piece, group_by_piece
 
 
 def extract(df: DataFrame):
