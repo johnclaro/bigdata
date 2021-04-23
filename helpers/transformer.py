@@ -30,7 +30,6 @@ schema = {
 def is_ply(value):
     return (
         '.' not in value and
-        '-' not in value and
         '{' not in value and
         '}' not in value and
         '%' not in value
