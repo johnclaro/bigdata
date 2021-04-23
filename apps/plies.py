@@ -5,18 +5,30 @@ from helpers.timer import timer
 
 
 @timer
-def extract(df: DataFrame):
-    df = df.\
+def get_notations_size(df: DataFrame):
+    df = df. \
         filter(
             (f.col('Result') != '')
-        ).\
+        ). \
         withColumn(
             'Plies',
             f.size('Notations')
-        ). \
+        )
+    return df
+
+
+@timer
+def group_by_result(df: DataFrame):
+    df = df. \
         groupBy('Plies', 'Result'). \
         pivot('Result'). \
-        count(). \
+        count()
+    return df
+
+
+@timer
+def group_by_plies(df: DataFrame):
+    df = df. \
         groupBy('Plies'). \
         agg(
             f.sum('0-1').alias('BlackWins'),
@@ -25,5 +37,11 @@ def extract(df: DataFrame):
         ). \
         na. \
         fill(0)
+    return df
 
+
+def extract(df: DataFrame):
+    df = get_notations_size(df)
+    df = group_by_result(df)
+    df = group_by_plies(df)
     return df
