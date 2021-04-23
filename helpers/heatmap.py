@@ -44,7 +44,7 @@ def map_turns(partition, piece):
 
 
 @timer
-def get_turns(df: DataFrame, piece, column):
+def get_piece(df: DataFrame, piece, column):
     df = df. \
         select('Notations').\
         rdd. \
@@ -55,7 +55,7 @@ def get_turns(df: DataFrame, piece, column):
 
 
 @timer
-def group_by_ply(df: DataFrame, column):
+def group_by_piece(df: DataFrame, column):
     df = df.\
         withColumn(
             column,
