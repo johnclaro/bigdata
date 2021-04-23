@@ -4,50 +4,38 @@ from pyspark.sql.dataframe import DataFrame
 from helpers.timer import timer
 
 
+def reformat(partition):
+    for row in partition:
+        for index in range(0, len(row.Notations), 2):
+            white = row.Notations[index]
+            try:
+                black = row.Notations[index + 1]
+            except IndexError:
+                black = None
+
+            if white == 'O-O':
+                white = 'Kg1'
+            elif white == 'O-O-O':
+                white = 'Kc1'
+            elif black == 'O-O':
+                black = 'Kg8'
+            elif black == 'O-O-O':
+                black = 'Kc8'
+
+            yield [white, black]
+
+
 @timer
-def get_plies(df: DataFrame):
+def get_turns(df: DataFrame):
     df = df. \
-        withColumn(
-            'Plies',
-            f.explode('Notations')
-        ). \
-        filter(
-            f.col('Plies').like('K%')
-        )
-    return df
+        select('Notations').\
+        rdd. \
+        mapPartitions(reformat). \
+        toDF(['WhitePly', 'BlackPly'])
 
-
-@timer
-def get_king_plies(df: DataFrame):
-    df = df.\
-        withColumn(
-            'KingPly',
-            f.regexp_replace(
-                f.split(
-                    f.regexp_replace(
-                        f.col('Plies'),
-                        'Kx',
-                        'K'
-                    ),
-                    'K'
-                )[1],
-                r'[^\w\*]',
-                ''
-            )
-        )
-    return df
-
-
-@timer
-def group_by_kings(df: DataFrame):
-    df = df.\
-        groupBy('KingPly').\
-        count().withColumnRenamed('count', 'Count')
     return df
 
 
 def extract(df: DataFrame):
-    df = get_plies(df)
-    df = get_king_plies(df)
-    df = group_by_kings(df)
+    df = get_turns(df)
     return df
