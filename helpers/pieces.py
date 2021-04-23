@@ -29,9 +29,9 @@ def map_notations(partition, piece):
             elif white == 'O-O-O':
                 white = 'Kc1' if piece == 'K' else 'Rd1'
             elif black == 'O-O':
-                white = 'Kg8' if piece == 'K' else 'Rf8'
+                black = 'Kg8' if piece == 'K' else 'Rf8'
             elif black == 'O-O-O':
-                white = 'Kc8' if piece == 'K' else 'Rd8'
+                black = 'Kc8' if piece == 'K' else 'Rd8'
 
             if white.startswith(piece):
                 white = remove_symbols(white)[-2:]
