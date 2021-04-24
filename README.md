@@ -4,10 +4,11 @@ Mining chess data using PySpark
 
 ## Getting started
 
-To save extracted data of openings
+To extract `openings` data for dataset `lichess_db_standard_rated_2013-01.pgn` 
+and save as a file
 ```console
 export PYTHONPATH=.
-spark-submit chess.py openings --save
+spark-submit chess.py openings -f lichess_db_standard_rated_2013-01.pgn -s
 ```
 
 ## Datasets
