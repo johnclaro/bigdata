@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-numbers = ['1', '2', '3', '4', '5', '6', '7', '8']
-alphabets = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+from helpers.pieces import numbers, alphabets
 
 
 def create_heatmap(data, row_labels, col_labels, ax=None, cbar_kw={},
