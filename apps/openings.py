@@ -78,7 +78,6 @@ def setup_elo_range_ids(df):
         0,
         1500,
         2000,
-        2500,
         9999,
     ]
     buckets = Bucketizer(
@@ -109,8 +108,7 @@ def assign_elo_range_labels(df):
     default_labels = (
         'Below1500',
         '1500-2000',
-        '2000-2500',
-        'Above2500',
+        'Above2000',
     )
     labels = f.array(
         *(f.lit(label) for label in default_labels)
